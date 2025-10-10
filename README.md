@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Fronius Solar Dashboard
 
-## Getting Started
+Next.js 15 dashboard that proxy-polls two Fronius inverters, persists snapshots to SQLite, and visualises live plus historical metrics for both dwellings.
 
-First, run the development server:
+## Local Development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The app expects the Fronius endpoints to be reachable from your machine. Copy `.env.local.example` to `.env.local` and adjust the IP addresses if required.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Description | Example |
+| --- | --- | --- |
+| `FRONIUS_PROPERTY_LABEL` | Display name for the property banner | `5 Oxford Road` |
+| `FRONIUS_NELSONS_URL` | Base URL for dwelling one inverter | `http://192.168.50.97` |
+| `FRONIUS_GRANNY_URL` | Base URL for dwelling two inverter | `http://192.168.50.27` |
+| `FRONIUS_TIMEOUT_MS` | Request timeout when polling devices | `3500` |
+| `NEXT_PUBLIC_MAX_GENERATION` | Gauge scaling for live cards | `12000` |
+| `SOLAR_DB_PATH` | SQLite file path. Points to `/data/solar.db` when running in containers/Railway | `./data/solar.db` |
 
-## Learn More
+The application creates the containing directory automatically.
 
-To learn more about Next.js, take a look at the following resources:
+## Production Build
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run build
+npm start
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Railway Deployment Prep
 
-## Deploy on Vercel
+The repository contains a multi-stage `Dockerfile` tailored for Railway. Railway’s default build flow will detect it and use the following sequence:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Install dependencies with `npm ci --omit=dev` (native build tooling is pre-installed for `better-sqlite3`).
+2. Run `npm run build`.
+3. Launch the service with `npm start` on port `3000`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Recommended Railway configuration once the repository is pushed to GitHub:
+
+1. Create a new Railway project directly from the GitHub repo.
+2. In the service settings add the environment variables above. Override `SOLAR_DB_PATH` with `/data/solar.db` so the SQLite database lives on the mounted persistent volume.
+3. Attach a Railway volume (e.g. `/data`, 1 GB is usually plenty) to preserve historical records between deploys.
+4. Ensure the `PORT` variable is set to `3000` (Railway injects this automatically).
+
+No deployment has been triggered from this workspace; pushing to GitHub keeps the setup ready for future Railway runs.
