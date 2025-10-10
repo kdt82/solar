@@ -20,17 +20,17 @@ if [ "${TAILSCALE_ENABLED:-1}" != "0" ]; then
   }
   trap cleanup EXIT INT TERM
 
-  # wait for daemon to accept commands
-  until tailscale status >/dev/null 2>&1; do
-    sleep 0.5
-  done
+  sleep 2
 
-  tailscale up \
+  if ! tailscale up \
     --authkey="${TAILSCALE_AUTH_KEY}" \
     --hostname="${TAILSCALE_HOSTNAME:-solar-railway}" \
     --accept-routes \
     --accept-dns=false \
-    ${TAILSCALE_ADDITIONAL_FLAGS:-}
+    ${TAILSCALE_ADDITIONAL_FLAGS:-}; then
+    echo "tailscale up failed; exiting" >&2
+    exit 1
+  fi
 fi
 
 exec npm start
