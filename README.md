@@ -21,6 +21,11 @@ The app expects the Fronius endpoints to be reachable from your machine. Copy `.
 | `FRONIUS_TIMEOUT_MS` | Request timeout when polling devices | `3500` |
 | `NEXT_PUBLIC_MAX_GENERATION` | Gauge scaling for live cards | `12000` |
 | `SOLAR_DB_PATH` | SQLite file path. Points to `/data/solar.db` when running in containers/Railway | `./data/solar.db` |
+| `TAILSCALE_AUTH_KEY` | (Railway/container) Ephemeral auth key used to join the Tailscale network. Required when Tailscale is enabled | |
+| `TAILSCALE_HOSTNAME` | Optional hostname to report to Tailscale | `solar-railway` |
+| `TAILSCALE_STATE_DIR` | Directory to persist the Tailscale state file | `/tmp` |
+| `TAILSCALE_ADDITIONAL_FLAGS` | Extra flags passed to `tailscale up` | `--accept-dns=false` |
+| `TAILSCALE_ENABLED` | Set to `0` to skip Tailscale startup (defaults to `1`) | `1` |
 
 The application creates the containing directory automatically.
 
@@ -37,13 +42,15 @@ The repository contains a multi-stage `Dockerfile` tailored for Railway. Railway
 
 1. Install dependencies with `npm ci --omit=dev` (native build tooling is pre-installed for `better-sqlite3`).
 2. Run `npm run build`.
-3. Launch the service with `npm start` on port `3000`.
+3. Launch the service through an entry script that brings up Tailscale and then runs `npm start` on port `3000`.
 
 Recommended Railway configuration once the repository is pushed to GitHub:
 
 1. Create a new Railway project directly from the GitHub repo.
 2. In the service settings add the environment variables above. Override `SOLAR_DB_PATH` with `/data/solar.db` so the SQLite database lives on the mounted persistent volume.
 3. Attach a Railway volume (e.g. `/data`, 1 GB is usually plenty) to preserve historical records between deploys.
-4. Ensure the `PORT` variable is set to `3000` (Railway injects this automatically).
+4. Set `TAILSCALE_AUTH_KEY` (Railway secret) to an ephemeral auth key generated from the Tailscale admin console. Optionally define `TAILSCALE_HOSTNAME`, `TAILSCALE_STATE_DIR`, or `TAILSCALE_ADDITIONAL_FLAGS`.
+5. Ensure the `PORT` variable is set to `3000` (Railway injects this automatically).
+6. On a device inside your home network, install Tailscale and run `tailscale up --advertise-routes=192.168.50.0/24 --accept-dns=false`. Approve the subnet route in the Tailscale admin console so the Railway node can reach the Fronius IPs.
 
 No deployment has been triggered from this workspace; pushing to GitHub keeps the setup ready for future Railway runs.
