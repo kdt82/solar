@@ -10,6 +10,8 @@ if [ "${TAILSCALE_ENABLED:-1}" != "0" ]; then
   STATE_DIR=${TAILSCALE_STATE_DIR:-/tmp}
   mkdir -p "${STATE_DIR}"
 
+  PATH="/usr/sbin:/usr/bin:${PATH}"
+
   /usr/sbin/tailscaled --tun=userspace-networking --state="${STATE_DIR}/tailscale.state" &
   TAILSCALED_PID=$!
 
@@ -19,11 +21,11 @@ if [ "${TAILSCALE_ENABLED:-1}" != "0" ]; then
   trap cleanup EXIT INT TERM
 
   # wait for daemon to accept commands
-  until /usr/bin/tailscale status >/dev/null 2>&1; do
+  until tailscale status >/dev/null 2>&1; do
     sleep 0.5
   done
 
-  /usr/bin/tailscale up \
+  tailscale up \
     --authkey="${TAILSCALE_AUTH_KEY}" \
     --hostname="${TAILSCALE_HOSTNAME:-solar-railway}" \
     --accept-routes \
