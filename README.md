@@ -26,6 +26,8 @@ The app expects the Fronius endpoints to be reachable from your machine. Copy `.
 | `TAILSCALE_STATE_DIR` | Directory to persist the Tailscale state file | `/tmp` |
 | `TAILSCALE_ADDITIONAL_FLAGS` | Extra flags passed to `tailscale up` | `--accept-dns=false` |
 | `TAILSCALE_ENABLED` | Set to `0` to skip Tailscale startup (defaults to `1`) | `1` |
+| `FRONIUS_NELSONS_CF_ID` / `FRONIUS_NELSONS_CF_SECRET` | Optional headers for Cloudflare Access protecting the Nelsons inverter hostname | |
+| `FRONIUS_GRANNY_CF_ID` / `FRONIUS_GRANNY_CF_SECRET` | Optional headers for Cloudflare Access protecting the Granny inverter hostname | |
 
 The application creates the containing directory automatically.
 

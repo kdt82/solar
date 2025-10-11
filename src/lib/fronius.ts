@@ -27,6 +27,7 @@ export async function getDeviceSnapshot(device: FroniusDevice): Promise<DeviceSn
     const response = await fetch(`${device.url}${REALTIME_PATH}`, {
       signal: controller.signal,
       cache: "no-store",
+      headers: device.headers,
     });
 
     if (!response.ok) {
