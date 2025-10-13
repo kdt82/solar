@@ -22,12 +22,28 @@ if [ "${TAILSCALE_ENABLED:-1}" != "0" ]; then
 
   sleep 2
 
-  if ! tailscale up \
-    --authkey="${TAILSCALE_AUTH_KEY}" \
-    --hostname="${TAILSCALE_HOSTNAME:-solar-railway}" \
-    --accept-routes \
-    --accept-dns=false \
-    ${TAILSCALE_ADDITIONAL_FLAGS:-}; then
+  TS_FLAGS="
+    --authkey=${TAILSCALE_AUTH_KEY}
+    --hostname=${TAILSCALE_HOSTNAME:-solar-railway}
+    --accept-routes
+  "
+
+  ADDITIONAL_FLAGS="${TAILSCALE_ADDITIONAL_FLAGS:-}"
+
+  case " ${ADDITIONAL_FLAGS} " in
+    *" --accept-dns"*|*" --accept-dns="*)
+      ;;
+    *)
+      TS_FLAGS="${TS_FLAGS} --accept-dns=false"
+      ;;
+  esac
+
+  if [ -n "${ADDITIONAL_FLAGS}" ]; then
+    TS_FLAGS="${TS_FLAGS} ${ADDITIONAL_FLAGS}"
+  fi
+
+  # shellcheck disable=SC2086 # intentional splitting of TS_FLAGS into words
+  if ! tailscale up ${TS_FLAGS}; then
     echo "tailscale up failed; exiting" >&2
     exit 1
   fi

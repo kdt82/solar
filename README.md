@@ -54,5 +54,7 @@ Recommended Railway configuration once the repository is pushed to GitHub:
 4. Set `TAILSCALE_AUTH_KEY` (Railway secret) to an ephemeral auth key generated from the Tailscale admin console. Optionally define `TAILSCALE_HOSTNAME`, `TAILSCALE_STATE_DIR`, or `TAILSCALE_ADDITIONAL_FLAGS`.
 5. Ensure the `PORT` variable is set to `3000` (Railway injects this automatically).
 6. On a device inside your home network, install Tailscale and run `tailscale up --advertise-routes=192.168.50.0/24 --accept-dns=false`. Approve the subnet route in the Tailscale admin console so the Railway node can reach the Fronius IPs.
+   - Detailed Raspberry Pi setup instructions live in `docs/raspberry-pi-subnet.md`.
+7. Follow `docs/railway-tailscale.md` for a full Railway + Tailscale deployment walkthrough.
 
 No deployment has been triggered from this workspace; pushing to GitHub keeps the setup ready for future Railway runs.
