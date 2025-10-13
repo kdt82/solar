@@ -49,12 +49,11 @@ if [ "${TAILSCALE_ENABLED:-1}" != "0" ]; then
   fi
 fi
 
-if [ -z "${HOST:-}" ]; then
-  export HOST=0.0.0.0
-fi
+HOST="${HOST:-0.0.0.0}"
+PORT="${PORT:-3000}"
 
-if [ -z "${HOSTNAME:-}" ]; then
-  export HOSTNAME=${HOST}
-fi
+export HOST
+export HOSTNAME="${HOSTNAME:-${HOST}}"
+export PORT
 
-exec npm start -- --hostname "${HOST}"
+exec npm start -- --hostname "${HOST}" --port "${PORT}"
