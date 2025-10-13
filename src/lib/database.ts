@@ -9,11 +9,28 @@ const DEFAULT_DB_PATH = join(process.cwd(), "data", "solar.db");
 const dbPath = process.env.SOLAR_DB_PATH ?? DEFAULT_DB_PATH;
 const dbDirectory = dirname(dbPath);
 
-mkdirSync(dbDirectory, { recursive: true });
+console.log(`[Database] Initializing database at: ${dbPath}`);
+console.log(`[Database] Creating directory: ${dbDirectory}`);
 
-const db = new Database(dbPath);
-db.pragma("journal_mode = WAL");
-db.pragma("synchronous = NORMAL");
+try {
+  mkdirSync(dbDirectory, { recursive: true });
+  console.log(`[Database] Directory created successfully`);
+} catch (error) {
+  console.error(`[Database] Failed to create directory:`, error);
+  throw error;
+}
+
+let db: Database.Database;
+try {
+  db = new Database(dbPath);
+  console.log(`[Database] Database file opened successfully`);
+  db.pragma("journal_mode = WAL");
+  db.pragma("synchronous = NORMAL");
+  console.log(`[Database] Database pragmas set successfully`);
+} catch (error) {
+  console.error(`[Database] Failed to initialize database:`, error);
+  throw error;
+}
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS devices (
