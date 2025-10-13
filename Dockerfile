@@ -17,7 +17,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 
-RUN apk add --no-cache tailscale
+RUN apk add --no-cache tailscale wget
 
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
