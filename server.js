@@ -2,6 +2,16 @@
 const { createServer } = require("http");
 const next = require("next");
 
+// Force database initialization during startup
+console.log(`[Server] Pre-loading database module...`);
+try {
+  require("./src/lib/database.ts");
+  console.log(`[Server] Database module loaded successfully`);
+} catch (error) {
+  console.error(`[Server] Failed to load database module:`, error);
+  process.exit(1);
+}
+
 const port = parseInt(process.env.PORT ?? "3000", 10);
 const hostname = process.env.HOST ?? "0.0.0.0";
 
