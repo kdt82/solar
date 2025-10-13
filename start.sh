@@ -48,31 +48,42 @@ if [ "${TAILSCALE_ENABLED:-1}" != "0" ]; then
     exit 1
   fi
   
-  echo "Tailscale is up. Testing connectivity to Fronius devices..."
+  echo "Tailscale is up. Checking network status..."
   
-  # Test connectivity to the Fronius devices
-  FRONIUS_NELSONS_URL="${FRONIUS_NELSONS_URL:-http://192.168.50.97}"
-  FRONIUS_GRANNY_URL="${FRONIUS_GRANNY_URL:-http://192.168.50.27}"
+  # Show Tailscale status for debugging
+  echo "Tailscale status:"
+  tailscale status || echo "Could not get tailscale status"
   
-  echo "Testing connection to Nelsons House: ${FRONIUS_NELSONS_URL}"
-  if wget -q --spider --timeout=5 "${FRONIUS_NELSONS_URL}/solar_api/v1/GetPowerFlowRealtimeData.fcgi" 2>/dev/null; then
-    echo "✓ Nelsons House is reachable"
-  else
-    echo "✗ WARNING: Cannot reach Nelsons House at ${FRONIUS_NELSONS_URL}"
-    echo "  This may indicate:"
-    echo "  - Raspberry Pi subnet router is offline"
-    echo "  - Subnet routes not approved in Tailscale admin"
-    echo "  - Fronius inverter is offline"
-  fi
+  echo ""
+  echo "Tailscale IP addresses:"
+  tailscale ip || echo "Could not get tailscale IPs"
   
-  echo "Testing connection to Granny Flat: ${FRONIUS_GRANNY_URL}"
-  if wget -q --spider --timeout=5 "${FRONIUS_GRANNY_URL}/solar_api/v1/GetPowerFlowRealtimeData.fcgi" 2>/dev/null; then
-    echo "✓ Granny Flat is reachable"
-  else
-    echo "✗ WARNING: Cannot reach Granny Flat at ${FRONIUS_GRANNY_URL}"
-  fi
+  echo ""
+  echo "Testing connectivity to Fronius devices (non-blocking)..."
   
-  echo "Connectivity tests complete. Starting application..."
+  # Test connectivity to the Fronius devices in background
+  # These tests won't block startup but will show in logs
+  (
+    sleep 3
+    FRONIUS_NELSONS_URL="${FRONIUS_NELSONS_URL:-http://192.168.50.97}"
+    FRONIUS_GRANNY_URL="${FRONIUS_GRANNY_URL:-http://192.168.50.27}"
+    
+    echo "[Connectivity Test] Testing Nelsons House: ${FRONIUS_NELSONS_URL}"
+    if wget -q --spider --timeout=10 "${FRONIUS_NELSONS_URL}/solar_api/v1/GetPowerFlowRealtimeData.fcgi" 2>&1; then
+      echo "[Connectivity Test] ✓ Nelsons House is reachable"
+    else
+      echo "[Connectivity Test] ✗ WARNING: Cannot reach Nelsons House at ${FRONIUS_NELSONS_URL}"
+    fi
+    
+    echo "[Connectivity Test] Testing Granny Flat: ${FRONIUS_GRANNY_URL}"
+    if wget -q --spider --timeout=10 "${FRONIUS_GRANNY_URL}/solar_api/v1/GetPowerFlowRealtimeData.fcgi" 2>&1; then
+      echo "[Connectivity Test] ✓ Granny Flat is reachable"
+    else
+      echo "[Connectivity Test] ✗ WARNING: Cannot reach Granny Flat at ${FRONIUS_GRANNY_URL}"
+    fi
+  ) &
+  
+  echo "Starting application (connectivity tests running in background)..."
 fi
 
 HOST="${HOST:-0.0.0.0}"
