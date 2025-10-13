@@ -40,7 +40,7 @@ export async function getDeviceSnapshot(device: FroniusDevice): Promise<DeviceSn
       signal: controller.signal,
       cache: "no-store",
       headers: device.headers,
-      // @ts-ignore - dispatcher is a valid option for Node.js fetch
+      // @ts-expect-error - dispatcher is a valid option for Node.js fetch
       dispatcher: proxyAgent,
     });
 
