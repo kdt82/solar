@@ -2,7 +2,7 @@ import Database from "better-sqlite3";
 import { mkdirSync } from "fs";
 import { dirname, join } from "path";
 import { randomUUID } from "crypto";
-import { devices } from "@/config/devices";
+import { getDevices } from "@/config/devices";
 import type { DeviceSnapshot } from "@/types/power";
 
 const DEFAULT_DB_PATH = join(process.cwd(), "data", "solar.db");
@@ -75,7 +75,7 @@ const insertSnapshotStmt = db.prepare(`
   )
 `);
 
-const ensureDevicesTransaction = db.transaction(() => {
+const ensureDevicesTransaction = db.transaction((devices: ReturnType<typeof getDevices>) => {
   for (const device of devices) {
     upsertDeviceStmt.run({
       id: device.id,
@@ -86,7 +86,8 @@ const ensureDevicesTransaction = db.transaction(() => {
 });
 
 export function ensureDevices() {
-  ensureDevicesTransaction();
+  const devices = getDevices();
+  ensureDevicesTransaction(devices);
 }
 
 const recordSnapshotsTransaction = db.transaction((snapshots: DeviceSnapshot[]) => {

@@ -5,35 +5,59 @@ export type FroniusDevice = {
   headers?: Record<string, string>;
 };
 
-const nelsonHeaders =
-  process.env.FRONIUS_NELSONS_CF_ID && process.env.FRONIUS_NELSONS_CF_SECRET
-    ? {
-        "CF-Access-Client-Id": process.env.FRONIUS_NELSONS_CF_ID,
-        "CF-Access-Client-Secret": process.env.FRONIUS_NELSONS_CF_SECRET,
-      }
-    : undefined;
+// Helper functions that evaluate environment variables at runtime
+function getNelsonHeaders(): Record<string, string> | undefined {
+  const cfId = process.env.FRONIUS_NELSONS_CF_ID;
+  const cfSecret = process.env.FRONIUS_NELSONS_CF_SECRET;
+  
+  if (cfId && cfSecret) {
+    return {
+      "CF-Access-Client-Id": cfId,
+      "CF-Access-Client-Secret": cfSecret,
+    };
+  }
+  return undefined;
+}
 
-const grannyHeaders =
-  process.env.FRONIUS_GRANNY_CF_ID && process.env.FRONIUS_GRANNY_CF_SECRET
-    ? {
-        "CF-Access-Client-Id": process.env.FRONIUS_GRANNY_CF_ID,
-        "CF-Access-Client-Secret": process.env.FRONIUS_GRANNY_CF_SECRET,
-      }
-    : undefined;
+function getGrannyHeaders(): Record<string, string> | undefined {
+  const cfId = process.env.FRONIUS_GRANNY_CF_ID;
+  const cfSecret = process.env.FRONIUS_GRANNY_CF_SECRET;
+  
+  if (cfId && cfSecret) {
+    return {
+      "CF-Access-Client-Id": cfId,
+      "CF-Access-Client-Secret": cfSecret,
+    };
+  }
+  return undefined;
+}
 
-export const devices: FroniusDevice[] = [
-  {
-    id: "nelsons-house",
-    label: "Nelsons House",
-    url: process.env.FRONIUS_NELSONS_URL ?? "http://192.168.50.97",
-    headers: nelsonHeaders,
-  },
-  {
-    id: "granny-flat",
-    label: "Granny Flat",
-    url: process.env.FRONIUS_GRANNY_URL ?? "http://192.168.50.27",
-    headers: grannyHeaders,
-  },
-];
+/**
+ * Gets the list of Fronius devices to poll.
+ * This function evaluates environment variables at runtime, ensuring
+ * Railway environment variables are available when the function is called.
+ */
+export function getDevices(): FroniusDevice[] {
+  return [
+    {
+      id: "nelsons-house",
+      label: "Nelsons House",
+      url: process.env.FRONIUS_NELSONS_URL ?? "http://192.168.50.97",
+      headers: getNelsonHeaders(),
+    },
+    {
+      id: "granny-flat",
+      label: "Granny Flat",
+      url: process.env.FRONIUS_GRANNY_URL ?? "http://192.168.50.27",
+      headers: getGrannyHeaders(),
+    },
+  ];
+}
 
-export const propertyLabel = process.env.FRONIUS_PROPERTY_LABEL ?? "5 Oxford Road";
+/**
+ * Gets the property label for display.
+ * This function evaluates environment variables at runtime.
+ */
+export function getPropertyLabel(): string {
+  return process.env.FRONIUS_PROPERTY_LABEL ?? "5 Oxford Road";
+}

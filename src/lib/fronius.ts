@@ -1,4 +1,4 @@
-import { devices, propertyLabel, type FroniusDevice } from "@/config/devices";
+import { getDevices, getPropertyLabel, type FroniusDevice } from "@/config/devices";
 import { ensureDevices, recordSnapshots } from "@/lib/database";
 import type { DeviceSnapshot, PowerDashboardData } from "@/types/power";
 
@@ -72,6 +72,7 @@ export async function getDeviceSnapshot(device: FroniusDevice): Promise<DeviceSn
 export async function getAllSnapshots(): Promise<PowerDashboardData> {
   ensureDevices();
 
+  const devices = getDevices();
   const results = await Promise.all(devices.map((device) => getDeviceSnapshot(device)));
 
   recordSnapshots(results);
@@ -97,7 +98,7 @@ export async function getAllSnapshots(): Promise<PowerDashboardData> {
   };
 
   return {
-    property: propertyLabel,
+    property: getPropertyLabel(),
     updatedAt: observedAt,
     devices: results,
     combined,
