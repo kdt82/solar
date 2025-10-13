@@ -56,4 +56,4 @@ export HOST
 export HOSTNAME="${HOSTNAME:-${HOST}}"
 export PORT
 
-exec npm start -- --hostname "${HOST}" --port "${PORT}"
+exec npm start
