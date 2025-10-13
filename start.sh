@@ -59,6 +59,14 @@ if [ "${TAILSCALE_ENABLED:-1}" != "0" ]; then
   tailscale ip || echo "Could not get tailscale IPs"
   
   echo ""
+  echo "Checking subnet routes:"
+  ip route | grep -i "100\." || echo "No Tailscale routes found in ip route"
+  
+  echo ""
+  echo "Testing direct ping to subnet router:"
+  ping -c 2 100.101.76.116 || echo "Cannot ping subnet router"
+  
+  echo ""
   echo "Testing connectivity to Fronius devices (non-blocking)..."
   
   # Test connectivity to the Fronius devices in background
@@ -69,18 +77,26 @@ if [ "${TAILSCALE_ENABLED:-1}" != "0" ]; then
     FRONIUS_GRANNY_URL="${FRONIUS_GRANNY_URL:-http://192.168.50.27}"
     
     echo "[Connectivity Test] Testing Nelsons House: ${FRONIUS_NELSONS_URL}"
-    if wget -q --spider --timeout=10 "${FRONIUS_NELSONS_URL}/solar_api/v1/GetPowerFlowRealtimeData.fcgi" 2>&1; then
-      echo "[Connectivity Test] ✓ Nelsons House is reachable"
+    if timeout 10 wget -qO- "${FRONIUS_NELSONS_URL}/solar_api/v1/GetPowerFlowRealtimeData.fcgi" > /dev/null 2>&1; then
+      echo "[Connectivity Test] ✓ Nelsons House is REACHABLE"
     else
-      echo "[Connectivity Test] ✗ WARNING: Cannot reach Nelsons House at ${FRONIUS_NELSONS_URL}"
+      EXIT_CODE=$?
+      echo "[Connectivity Test] ✗ FAILED: Cannot reach Nelsons House at ${FRONIUS_NELSONS_URL} (exit code: $EXIT_CODE)"
+      echo "[Connectivity Test] Attempting to diagnose..."
+      echo "[Connectivity Test] Route table for 192.168.50.0/24:"
+      ip route get 192.168.50.97 2>&1 || echo "No route found"
+      echo "[Connectivity Test] Testing if subnet router is reachable:"
+      ping -c 2 100.101.76.116 2>&1 || echo "Cannot ping subnet router"
     fi
     
     echo "[Connectivity Test] Testing Granny Flat: ${FRONIUS_GRANNY_URL}"
-    if wget -q --spider --timeout=10 "${FRONIUS_GRANNY_URL}/solar_api/v1/GetPowerFlowRealtimeData.fcgi" 2>&1; then
-      echo "[Connectivity Test] ✓ Granny Flat is reachable"
+    if timeout 10 wget -qO- "${FRONIUS_GRANNY_URL}/solar_api/v1/GetPowerFlowRealtimeData.fcgi" > /dev/null 2>&1; then
+      echo "[Connectivity Test] ✓ Granny Flat is REACHABLE"
     else
-      echo "[Connectivity Test] ✗ WARNING: Cannot reach Granny Flat at ${FRONIUS_GRANNY_URL}"
+      echo "[Connectivity Test] ✗ FAILED: Cannot reach Granny Flat at ${FRONIUS_GRANNY_URL}"
     fi
+    
+    echo "[Connectivity Test] Tests complete."
   ) &
   
   echo "Starting application (connectivity tests running in background)..."
