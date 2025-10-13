@@ -1,6 +1,7 @@
 import { getDevices, getPropertyLabel, type FroniusDevice } from "@/config/devices";
 import { ensureDevices, recordSnapshots } from "@/lib/database";
 import type { DeviceSnapshot, PowerDashboardData } from "@/types/power";
+import { SocksProxyAgent } from "socks-proxy-agent";
 
 type FroniusRealtimeResponse = {
   Head?: Record<string, unknown>;
@@ -18,6 +19,15 @@ type FroniusRealtimeResponse = {
 const REALTIME_PATH = "/solar_api/v1/GetPowerFlowRealtimeData.fcgi";
 const REQUEST_TIMEOUT_MS = parseInt(process.env.FRONIUS_TIMEOUT_MS ?? "3500", 10);
 
+// Create SOCKS5 proxy agent if ALL_PROXY is set (for Tailscale routing)
+const proxyAgent = process.env.ALL_PROXY 
+  ? new SocksProxyAgent(process.env.ALL_PROXY)
+  : undefined;
+
+if (proxyAgent) {
+  console.log(`Using SOCKS5 proxy: ${process.env.ALL_PROXY}`);
+}
+
 export async function getDeviceSnapshot(device: FroniusDevice): Promise<DeviceSnapshot> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -30,6 +40,8 @@ export async function getDeviceSnapshot(device: FroniusDevice): Promise<DeviceSn
       signal: controller.signal,
       cache: "no-store",
       headers: device.headers,
+      // @ts-ignore - dispatcher is a valid option for Node.js fetch
+      dispatcher: proxyAgent,
     });
 
     if (!response.ok) {

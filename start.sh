@@ -12,7 +12,7 @@ if [ "${TAILSCALE_ENABLED:-1}" != "0" ]; then
 
   PATH="/usr/sbin:/usr/bin:${PATH}"
 
-  /usr/sbin/tailscaled --tun=userspace-networking --state="${STATE_DIR}/tailscale.state" &
+  /usr/sbin/tailscaled --tun=userspace-networking --socks5-server=localhost:1055 --state="${STATE_DIR}/tailscale.state" &
   TAILSCALED_PID=$!
 
   cleanup() {
@@ -48,23 +48,16 @@ if [ "${TAILSCALE_ENABLED:-1}" != "0" ]; then
     exit 1
   fi
   
-  echo "Tailscale is up. Checking network status..."
+  echo "Tailscale is up. Configuring routing..."
   
-  # Show Tailscale status for debugging
-  echo "Tailscale status:"
-  tailscale status || echo "Could not get tailscale status"
+  # Configure Node.js to use Tailscale's SOCKS5 proxy
+  # This routes all network requests through Tailscale
+  export ALL_PROXY="socks5://localhost:1055"
+  export HTTP_PROXY="socks5://localhost:1055"
+  export HTTPS_PROXY="socks5://localhost:1055"
   
-  echo ""
-  echo "Tailscale IP addresses:"
-  tailscale ip || echo "Could not get tailscale IPs"
-  
-  echo ""
-  echo "Checking subnet routes:"
-  ip route | grep -i "100\." || echo "No Tailscale routes found in ip route"
-  
-  echo ""
-  echo "Testing direct ping to subnet router:"
-  ping -c 2 100.101.76.116 || echo "Cannot ping subnet router"
+  echo "Configured to route through Tailscale SOCKS5 proxy on localhost:1055"
+  echo "Starting application..."
   
   echo ""
   echo "Testing connectivity to Fronius devices (non-blocking)..."
