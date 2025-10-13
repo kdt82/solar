@@ -40,7 +40,7 @@ export async function getDeviceSnapshot(device: FroniusDevice): Promise<DeviceSn
     
     // Use node-fetch with SOCKS5 proxy agent support
     const response = await nodeFetch(fullUrl, {
-      signal: controller.signal as any,
+      signal: controller.signal as AbortSignal,
       headers: device.headers,
       agent: proxyAgent,
     });
