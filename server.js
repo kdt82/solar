@@ -2,6 +2,27 @@
 const { createServer } = require("http");
 const next = require("next");
 
+// Handle uncaught errors
+process.on('uncaughtException', (error) => {
+  console.error('[Server] Uncaught Exception:', error);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[Server] Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
+});
+
+process.on('SIGTERM', () => {
+  console.log('[Server] SIGTERM received');
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('[Server] SIGINT received');
+  process.exit(0);
+});
+
 // Force database initialization during startup
 console.log(`[Server] Pre-loading database module...`);
 try {
