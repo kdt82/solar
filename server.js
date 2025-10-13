@@ -17,7 +17,12 @@ app
   .prepare()
   .then(() => {
     createServer((req, res) => {
-      handle(req, res);
+      console.log(`${new Date().toISOString()} ${req.method} ${req.url} from ${req.socket.remoteAddress}`);
+      handle(req, res).catch((error) => {
+        console.error("Error handling request", error);
+        res.statusCode = 500;
+        res.end("Internal Server Error");
+      });
     }).listen(port, hostname, () => {
       console.log(`Next.js server ready on http://${hostname}:${port}`);
     });
