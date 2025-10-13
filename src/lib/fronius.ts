@@ -24,7 +24,9 @@ export async function getDeviceSnapshot(device: FroniusDevice): Promise<DeviceSn
 
   try {
     const requestedAt = new Date().toISOString();
-    const response = await fetch(`${device.url}${REALTIME_PATH}`, {
+    const fullUrl = `${device.url}${REALTIME_PATH}`;
+    console.log(`[${device.id}] Fetching from: ${fullUrl}`);
+    const response = await fetch(fullUrl, {
       signal: controller.signal,
       cache: "no-store",
       headers: device.headers,
@@ -54,6 +56,7 @@ export async function getDeviceSnapshot(device: FroniusDevice): Promise<DeviceSn
     return snapshot;
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
+    console.error(`[${device.id}] Error fetching data from ${device.url}: ${message}`);
     return {
       id: device.id,
       label: device.label,
@@ -73,6 +76,7 @@ export async function getAllSnapshots(): Promise<PowerDashboardData> {
   ensureDevices();
 
   const devices = getDevices();
+  console.log(`Polling ${devices.length} devices:`, devices.map(d => `${d.id}=${d.url}`).join(', '));
   const results = await Promise.all(devices.map((device) => getDeviceSnapshot(device)));
 
   recordSnapshots(results);
