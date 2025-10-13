@@ -49,4 +49,5 @@ if [ "${TAILSCALE_ENABLED:-1}" != "0" ]; then
   fi
 fi
 
+[ -n "${HOSTNAME:-}" ] || export HOSTNAME=0.0.0.0
 exec npm start
