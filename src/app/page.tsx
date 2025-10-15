@@ -19,8 +19,18 @@ import {
   IconSun,
   IconTrendingUp,
 } from "@tabler/icons-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import { usePowerData } from "@/hooks/usePowerData";
 import { useHistoricalMetrics, RANGE_OPTIONS, type RangeKey } from "@/hooks/useHistoricalMetrics";
+import { EnergyFlow } from "@/components/EnergyFlow";
 import type { DeviceSnapshot, HistoricalSummary } from "@/types/power";
 import styles from "./page.module.css";
 
@@ -146,11 +156,21 @@ export default function Home() {
       {cards.length === 0 ? (
         <ErrorState message="No devices configured yet." onRetry={() => mutate()} />
       ) : (
-        <section className={styles.grid}>
-          {cards.map((snapshot, index) => (
-            <PowerCard key={snapshot.id} snapshot={snapshot} index={index} />
-          ))}
-        </section>
+        <>
+          <section className={styles.grid}>
+            {cards.map((snapshot, index) => (
+              <PowerCard key={snapshot.id} snapshot={snapshot} index={index} />
+            ))}
+          </section>
+          
+          {data?.combined && (
+            <EnergyFlow
+              generation={data.combined.generation}
+              consumption={data.combined.consumption}
+              grid={data.combined.grid}
+            />
+          )}
+        </>
       )}
 
       <HistoricalSection
@@ -659,44 +679,54 @@ function Sparkline({ points }: SparklineProps) {
     return null;
   }
 
-  const width = 420;
-  const height = 140;
-  const padding = 18;
-  const maxGeneration = Math.max(...points.map((point) => point.generation), 1);
-  const coords = points.map((point, index) => {
-    const x =
-      padding + (index / Math.max(points.length - 1, 1)) * (width - padding * 2);
-    const ratio = point.generation / maxGeneration;
-    const y = height - padding - ratio * (height - padding * 2);
-    return { x, y };
-  });
+  const chartData = points.map((point) => ({
+    timestamp: new Date(point.timestamp).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+    generation: point.generation,
+    fullTimestamp: point.timestamp,
+  }));
 
-  const first = coords[0];
-  const last = coords[coords.length - 1];
-  const linePath = coords
-    .map((coordinate, index) =>
-      `${index === 0 ? "M" : "L"} ${coordinate.x.toFixed(2)} ${coordinate.y.toFixed(2)}`
-    )
-    .join(" ");
-  const areaPath = `${linePath} L ${last.x.toFixed(2)} ${(height - padding).toFixed(2)} L ${first.x.toFixed(2)} ${(height - padding).toFixed(2)} Z`;
+  // Show only every nth label to avoid crowding
+  const labelInterval = Math.max(0, Math.floor(chartData.length / 6));
 
   return (
-    <svg className={styles.sparkline} viewBox={`0 0 ${width} ${height}`} role="img">
-      <defs>
-        <linearGradient id="sparklineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="rgba(90, 241, 140, 0.55)" />
-          <stop offset="100%" stopColor="rgba(90, 241, 140, 0.05)" />
-        </linearGradient>
-      </defs>
-      <path d={areaPath} fill="url(#sparklineGradient)" opacity={0.75} />
-      <path
-        d={linePath}
-        fill="none"
-        stroke="var(--positive)"
-        strokeWidth={2.4}
-        strokeLinecap="round"
-      />
-    </svg>
+    <ResponsiveContainer width="100%" height={250}>
+      <LineChart data={chartData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+        <XAxis
+          dataKey="timestamp"
+          tick={{ fontSize: 12, fill: "#666" }}
+          interval={labelInterval}
+          angle={-45}
+          textAnchor="end"
+          height={80}
+        />
+        <YAxis
+          label={{ value: "Power (kW)", angle: -90, position: "insideLeft" }}
+          tick={{ fontSize: 12, fill: "#666" }}
+        />
+        <Tooltip
+          contentStyle={{
+            backgroundColor: "rgba(255, 255, 255, 0.95)",
+            border: "1px solid #ccc",
+            borderRadius: "4px",
+            padding: "8px",
+          }}
+          formatter={(value: unknown) => [`${(value as number).toFixed(2)} kW`, "Generation"]}
+          labelFormatter={(label: unknown) => `Time: ${label}`}
+        />
+        <Line
+          type="monotone"
+          dataKey="generation"
+          stroke="var(--positive)"
+          strokeWidth={2.5}
+          dot={false}
+          isAnimationActive={true}
+        />
+      </LineChart>
+    </ResponsiveContainer>
   );
 }
 function SkeletonGrid() {

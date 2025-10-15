@@ -1,0 +1,109 @@
+.container {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 24px 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.diagram {
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+  margin: 0 auto;
+  display: block;
+}
+
+.circle {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  transition: filter 0.3s ease;
+}
+
+.circle:hover {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2)) brightness(1.1);
+}
+
+.icon {
+  pointer-events: none;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #34495e;
+  fill: #34495e;
+}
+
+.value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2c3e50;
+  fill: #2c3e50;
+}
+
+.flowLine {
+  stroke: #bdc3c7;
+  stroke-width: 3;
+  fill: none;
+}
+
+.flowArrow {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+.lineLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #7f8c8d;
+  fill: #7f8c8d;
+  text-anchor: middle;
+}
+
+.sourceGroup,
+.homeGroup,
+.gridGroup {
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.sourceGroup:hover,
+.homeGroup:hover,
+.gridGroup:hover {
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+    margin: 16px 0;
+  }
+
+  .title {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+
+  .diagram {
+    max-width: 100%;
+  }
+
+  .label {
+    font-size: 12px;
+  }
+
+  .value {
+    font-size: 14px;
+  }
+
+  .lineLabel {
+    font-size: 10px;
+  }
+}
