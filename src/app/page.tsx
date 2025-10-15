@@ -18,6 +18,8 @@ import {
   IconSparkles,
   IconSun,
   IconTrendingUp,
+  IconMoon,
+  IconSunHigh,
 } from "@tabler/icons-react";
 import {
   LineChart,
@@ -30,7 +32,8 @@ import {
 } from "recharts";
 import { usePowerData } from "@/hooks/usePowerData";
 import { useHistoricalMetrics, RANGE_OPTIONS, type RangeKey } from "@/hooks/useHistoricalMetrics";
-import { EnergyFlow } from "@/components/EnergyFlow";
+import { PropertyEnergyFlow, CombinedEnergyFlow } from "@/components/EnergyFlow";
+import { useTheme } from "@/hooks/useTheme";
 import type { DeviceSnapshot, HistoricalSummary } from "@/types/power";
 import styles from "./page.module.css";
 
@@ -56,6 +59,7 @@ const cardVariants: Variants = {
 };
 
 export default function Home() {
+  const { theme, toggleTheme } = useTheme();
   const [range, setRange] = useState<RangeKey>("24h");
   const [customRange, setCustomRange] = useState<{ from?: string; to?: string }>({});
   const { data, error, isLoading, mutate, isValidating } = usePowerData();
@@ -140,6 +144,9 @@ export default function Home() {
           </div>
         </div>
         <div className={styles.actions}>
+          <button className={styles.themeToggle} onClick={toggleTheme} title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
+            {theme === 'light' ? <IconMoon size={20} /> : <IconSunHigh size={20} />}
+          </button>
           <button className={styles.refresh} onClick={() => mutate()}>
             <motion.span
               animate={isValidating ? { rotate: 360 } : { rotate: 0 }}
@@ -157,19 +164,38 @@ export default function Home() {
         <ErrorState message="No devices configured yet." onRetry={() => mutate()} />
       ) : (
         <>
-          <section className={styles.grid}>
-            {cards.map((snapshot, index) => (
-              <PowerCard key={snapshot.id} snapshot={snapshot} index={index} />
-            ))}
-          </section>
-          
+          {/* Combined Energy Flow first */}
           {data?.combined && (
-            <EnergyFlow
+            <CombinedEnergyFlow
               generation={data.combined.generation}
               consumption={data.combined.consumption}
               grid={data.combined.grid}
             />
           )}
+
+          {/* Individual Property Flows */}
+          {data?.devices && (
+            <section className={styles.energyFlowSection}>
+              <div className={styles.energyFlowGrid}>
+                {data.devices.map((device) => (
+                  <PropertyEnergyFlow
+                    key={device.id}
+                    label={device.label}
+                    generation={device.generation}
+                    consumption={device.consumption}
+                    grid={device.grid}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Data Cards at the bottom */}
+          <section className={styles.grid}>
+            {cards.map((snapshot, index) => (
+              <PowerCard key={snapshot.id} snapshot={snapshot} index={index} />
+            ))}
+          </section>
         </>
       )}
 

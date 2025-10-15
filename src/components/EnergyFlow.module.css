@@ -1,109 +1,152 @@
-.container {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+.propertyFlow {
+  background: white;
   border-radius: 12px;
-  padding: 24px;
-  margin: 24px 0;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin: 16px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.title {
-  font-size: 20px;
+:root[data-theme="dark"] .propertyFlow {
+  background: linear-gradient(150deg, rgba(15, 23, 42, 0.85), rgba(17, 24, 39, 0.65));
+  border: 1px solid rgba(93, 123, 255, 0.18);
+  box-shadow: 0 8px 24px rgba(8, 12, 26, 0.55);
+}
+
+.propertyTitle {
+  font-size: 18px;
   font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 20px;
+  color: #1f2937;
+  margin: 0 0 16px 0;
   text-align: center;
+}
+
+:root[data-theme="dark"] .propertyTitle {
+  color: #f8fafc;
+}
+
+.combinedFlow {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-radius: 16px;
+  padding: 32px 24px;
+  margin: 24px 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+:root[data-theme="dark"] .combinedFlow {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.2) 0%, rgba(59, 130, 246, 0.15) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  box-shadow: 0 8px 24px rgba(14, 165, 233, 0.25);
+}
+
+.combinedTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 24px 0;
+  text-align: center;
+}
+
+:root[data-theme="dark"] .combinedTitle {
+  color: #f8fafc;
 }
 
 .diagram {
   width: 100%;
-  max-width: 800px;
+  max-width: 600px;
+  height: auto;
+  margin: 0 auto;
+  display: block;
+}
+
+.diagramLarge {
+  width: 100%;
+  max-width: 700px;
   height: auto;
   margin: 0 auto;
   display: block;
 }
 
 .circle {
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-  transition: filter 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+  transition: all 0.3s ease;
 }
 
 .circle:hover {
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2)) brightness(1.1);
-}
-
-.icon {
-  pointer-events: none;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.25));
 }
 
 .label {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
-  color: #34495e;
-  fill: #34495e;
+  fill: #4b5563;
+}
+
+:root[data-theme="dark"] .label {
+  fill: #94a3b8;
 }
 
 .value {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
-  color: #2c3e50;
-  fill: #2c3e50;
+  fill: #1f2937;
 }
 
-.flowLine {
-  stroke: #bdc3c7;
-  stroke-width: 3;
-  fill: none;
+:root[data-theme="dark"] .value {
+  fill: #f1f5f9;
 }
 
-.flowArrow {
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
-}
-
-.lineLabel {
-  font-size: 12px;
+.labelLarge {
+  font-size: 14px;
   font-weight: 600;
-  color: #7f8c8d;
-  fill: #7f8c8d;
-  text-anchor: middle;
+  fill: #374151;
 }
 
-.sourceGroup,
-.homeGroup,
-.gridGroup {
-  cursor: pointer;
-  transition: opacity 0.3s ease;
+:root[data-theme="dark"] .labelLarge {
+  fill: #cbd5e1;
 }
 
-.sourceGroup:hover,
-.homeGroup:hover,
-.gridGroup:hover {
-  opacity: 0.8;
+.valueLarge {
+  font-size: 18px;
+  font-weight: 800;
+  fill: #111827;
+}
+
+:root[data-theme="dark"] .valueLarge {
+  fill: #f8fafc;
 }
 
 @media (max-width: 768px) {
-  .container {
+  .propertyFlow {
     padding: 16px;
-    margin: 16px 0;
+    margin: 12px 0;
   }
 
-  .title {
-    font-size: 18px;
-    margin-bottom: 16px;
+  .propertyTitle {
+    font-size: 16px;
   }
 
-  .diagram {
-    max-width: 100%;
+  .combinedFlow {
+    padding: 24px 16px;
+    margin: 20px 0;
+  }
+
+  .combinedTitle {
+    font-size: 20px;
   }
 
   .label {
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .value {
-    font-size: 14px;
+    font-size: 13px;
   }
 
-  .lineLabel {
-    font-size: 10px;
+  .labelLarge {
+    font-size: 12px;
+  }
+
+  .valueLarge {
+    font-size: 16px;
   }
 }
