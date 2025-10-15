@@ -117,36 +117,84 @@
 
 @media (max-width: 768px) {
   .propertyFlow {
-    padding: 16px;
-    margin: 12px 0;
+    padding: 14px;
+    margin: 10px 0;
   }
 
   .propertyTitle {
-    font-size: 16px;
+    font-size: 15px;
+    margin-bottom: 12px;
   }
 
   .combinedFlow {
-    padding: 24px 16px;
-    margin: 20px 0;
+    padding: 20px 14px;
+    margin: 16px 0;
   }
 
   .combinedTitle {
-    font-size: 20px;
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+
+  .diagram {
+    max-width: 100%;
+  }
+
+  .diagramLarge {
+    max-width: 100%;
   }
 
   .label {
-    font-size: 11px;
+    font-size: 10px;
   }
 
   .value {
-    font-size: 13px;
-  }
-
-  .labelLarge {
     font-size: 12px;
   }
 
+  .labelLarge {
+    font-size: 11px;
+  }
+
   .valueLarge {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .propertyFlow {
+    padding: 12px;
+    margin: 8px 0;
+  }
+
+  .propertyTitle {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+
+  .combinedFlow {
+    padding: 16px 12px;
+    margin: 12px 0;
+  }
+
+  .combinedTitle {
     font-size: 16px;
+    margin-bottom: 16px;
+  }
+
+  .label {
+    font-size: 9px;
+  }
+
+  .value {
+    font-size: 11px;
+  }
+
+  .labelLarge {
+    font-size: 10px;
+  }
+
+  .valueLarge {
+    font-size: 13px;
   }
 }

@@ -43,13 +43,14 @@ export async function getDeviceSnapshot(device: FroniusDevice): Promise<DeviceSn
       throw new Error("Missing site data in response");
     }
 
+    // Fronius API returns values in Watts, convert to kW
     const snapshot: DeviceSnapshot = {
       id: device.id,
       label: device.label,
       timestamp: requestedAt,
-      generation: site.P_PV ?? 0,
-      consumption: site.P_Load ?? 0,
-      grid: site.P_Grid ?? 0,
+      generation: (site.P_PV ?? 0) / 1000,
+      consumption: (site.P_Load ?? 0) / 1000,
+      grid: (site.P_Grid ?? 0) / 1000,
       status: "ok",
     };
 
