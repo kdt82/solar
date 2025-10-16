@@ -66,11 +66,11 @@ export function LiveDataCard({ generation, consumption, grid, isOnline = true }:
         </div>
       </div>
 
-      <svg className={styles.diagram} viewBox="0 0 350 200" preserveAspectRatio="xMidYMid meet">
+      <svg className={styles.diagram} viewBox="0 0 350 220" preserveAspectRatio="xMidYMid meet">
         {/* Generation Circle */}
         <circle 
           cx="65" 
-          cy="80" 
+          cy="70" 
           r="30" 
           fill="#fbbf24" 
           className={styles.circle}
@@ -78,7 +78,7 @@ export function LiveDataCard({ generation, consumption, grid, isOnline = true }:
         />
         <text 
           x="65" 
-          y="85" 
+          y="75" 
           textAnchor="middle" 
           dominantBaseline="middle" 
           fontSize="28"
@@ -89,27 +89,27 @@ export function LiveDataCard({ generation, consumption, grid, isOnline = true }:
         <text x="65" y="125" textAnchor="middle" className={styles.value} fontWeight="600">
           {generation.toFixed(2)}
         </text>
-        <text x="65" y="142" textAnchor="middle" className={styles.unit}>kW</text>
+        <text x="65" y="148" textAnchor="middle" className={styles.unit}>kW</text>
 
         {/* Consumption Circle */}
-        <circle cx="175" cy="80" r="30" fill="#60a5fa" className={styles.circle} />
-        <text x="175" y="85" textAnchor="middle" dominantBaseline="middle" fontSize="28">🏠</text>
+        <circle cx="175" cy="70" r="30" fill="#60a5fa" className={styles.circle} />
+        <text x="175" y="75" textAnchor="middle" dominantBaseline="middle" fontSize="28">🏠</text>
         <text x="175" y="125" textAnchor="middle" className={styles.value} fontWeight="600">
           {Math.abs(consumption).toFixed(2)}
         </text>
-        <text x="175" y="142" textAnchor="middle" className={styles.unit}>kW</text>
+        <text x="175" y="148" textAnchor="middle" className={styles.unit}>kW</text>
 
         {/* Grid Circle */}
-        <circle cx="285" cy="80" r="30" fill={isExporting ? "#4ade80" : "#f87171"} className={styles.circle} />
-        <text x="285" y="85" textAnchor="middle" dominantBaseline="middle" fontSize="28">⚡</text>
+        <circle cx="285" cy="70" r="30" fill={isExporting ? "#4ade80" : "#f87171"} className={styles.circle} />
+        <text x="285" y="75" textAnchor="middle" dominantBaseline="middle" fontSize="28">⚡</text>
         <text x="285" y="125" textAnchor="middle" className={styles.value} fontWeight="600">
           {Math.abs(grid).toFixed(2)}
         </text>
-        <text x="285" y="142" textAnchor="middle" className={styles.unit}>kW</text>
+        <text x="285" y="148" textAnchor="middle" className={styles.unit}>kW</text>
 
         {/* Connecting line path with dots */}
         <path
-          d="M 95 80 L 145 80 M 205 80 L 255 80"
+          d="M 95 70 L 145 70 M 205 70 L 255 70"
           stroke="#e5e7eb"
           strokeWidth="2"
           strokeDasharray="0"
@@ -122,7 +122,7 @@ export function LiveDataCard({ generation, consumption, grid, isOnline = true }:
           <>
             <motion.circle
               cx="95"
-              cy="80"
+              cy="70"
               r="3"
               fill="#fbbf24"
               animate={{ cx: [95, 145] }}
@@ -130,7 +130,7 @@ export function LiveDataCard({ generation, consumption, grid, isOnline = true }:
             />
             <motion.circle
               cx="105"
-              cy="80"
+              cy="70"
               r="3"
               fill="#fbbf24"
               animate={{ cx: [95, 145] }}
@@ -138,7 +138,7 @@ export function LiveDataCard({ generation, consumption, grid, isOnline = true }:
             />
             <motion.circle
               cx="115"
-              cy="80"
+              cy="70"
               r="3"
               fill="#fbbf24"
               animate={{ cx: [95, 145] }}
@@ -153,7 +153,7 @@ export function LiveDataCard({ generation, consumption, grid, isOnline = true }:
           <>
             <motion.circle
               cx="205"
-              cy="80"
+              cy="70"
               r="3"
               fill="#4ade80"
               animate={{ cx: [205, 255] }}
@@ -161,7 +161,7 @@ export function LiveDataCard({ generation, consumption, grid, isOnline = true }:
             />
             <motion.circle
               cx="215"
-              cy="80"
+              cy="70"
               r="3"
               fill="#4ade80"
               animate={{ cx: [205, 255] }}
@@ -169,7 +169,7 @@ export function LiveDataCard({ generation, consumption, grid, isOnline = true }:
             />
             <motion.circle
               cx="225"
-              cy="80"
+              cy="70"
               r="3"
               fill="#4ade80"
               animate={{ cx: [205, 255] }}
@@ -181,7 +181,7 @@ export function LiveDataCard({ generation, consumption, grid, isOnline = true }:
           <>
             <motion.circle
               cx="255"
-              cy="80"
+              cy="70"
               r="3"
               fill="#f87171"
               animate={{ cx: [255, 205] }}
@@ -189,7 +189,7 @@ export function LiveDataCard({ generation, consumption, grid, isOnline = true }:
             />
             <motion.circle
               cx="245"
-              cy="80"
+              cy="70"
               r="3"
               fill="#f87171"
               animate={{ cx: [255, 205] }}
@@ -197,7 +197,7 @@ export function LiveDataCard({ generation, consumption, grid, isOnline = true }:
             />
             <motion.circle
               cx="235"
-              cy="80"
+              cy="70"
               r="3"
               fill="#f87171"
               animate={{ cx: [255, 205] }}

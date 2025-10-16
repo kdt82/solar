@@ -916,7 +916,7 @@
   }
 
   .liveDataSection {
-    margin: 0;
+    margin: 0 0 0.75rem 0;
   }
 
   .summarySection {
@@ -1014,13 +1014,12 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  margin-top: 1rem;
 }
 
 .liveDataSection {
   display: flex;
   justify-content: center;
-  margin: 1.5rem 0;
+  margin: 0 0 2rem 0;
 }
 
 .energyFlowGrid {

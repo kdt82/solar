@@ -156,23 +156,22 @@ export default function Home() {
         <ErrorState message="No devices configured yet." onRetry={() => mutate()} />
       ) : (
         <>
-          {/* Live Data Card */}
-          {data?.combined && (
-            <section className={styles.liveDataSection}>
-              <LiveDataCard
-                generation={data.combined.generation}
-                consumption={data.combined.consumption}
-                grid={data.combined.grid}
-                isOnline={!error && !isLoading}
-              />
-            </section>
-          )}
-
-          {/* Individual Property Flows */}
-          {data?.devices && (
+          {/* Live Data Card and Property Flows in same grid */}
+          {(data?.combined || data?.devices) && (
             <section className={styles.energyFlowSection}>
               <div className={styles.energyFlowGrid}>
-                {data.devices.map((device) => (
+                {/* Live Data Card */}
+                {data?.combined && (
+                  <LiveDataCard
+                    generation={data.combined.generation}
+                    consumption={data.combined.consumption}
+                    grid={data.combined.grid}
+                    isOnline={!error && !isLoading}
+                  />
+                )}
+                
+                {/* Individual Property Flows */}
+                {data?.devices?.map((device) => (
                   <PropertyEnergyFlow
                     key={device.id}
                     label={device.label}
