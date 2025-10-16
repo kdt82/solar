@@ -30,7 +30,7 @@ async function fixSnapshotUnits() {
   }
 
   console.log("Sample of bad data:");
-  badSnapshots.slice(0, 5).forEach(s => {
+  badSnapshots.slice(0, 5).forEach((s: typeof badSnapshots[0]) => {
     console.log(`  ${s.timestamp.toISOString()}: gen=${s.generation} kW, cons=${s.consumption} kW, grid=${s.grid} kW`);
   });
 
