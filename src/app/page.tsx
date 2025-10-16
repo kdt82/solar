@@ -6,8 +6,6 @@ import {
   IconAlertTriangle,
   IconArrowDownRight,
   IconArrowUpRight,
-  IconBolt,
-  IconBuildingEstate,
   IconCalendarEvent,
   IconChartAreaLine,
   IconClockHour4,
@@ -137,17 +135,6 @@ export default function Home() {
   return (
     <main className={styles.wrapper}>
       <section className={styles.header}>
-        <div className={styles.headline}>
-          <h1 className={styles.property}>{data?.property ?? "Solar Dashboard"}</h1>
-          <div className={styles.subtitle}>
-            <span>
-              <IconBuildingEstate size={18} /> Live generation, consumption & grid flow
-            </span>
-            <span>
-              <IconBolt size={18} /> Auto refresh every 5 seconds
-            </span>
-          </div>
-        </div>
         <div className={styles.actions}>
           <button className={styles.themeToggle} onClick={toggleTheme} title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
             {theme === 'light' ? <IconMoon size={20} /> : <IconSunHigh size={20} />}
@@ -260,7 +247,7 @@ function PowerCard({ snapshot, index }: PowerCardProps) {
   const generationRatio = Math.max(0, Math.min(1, (snapshot.generation * 1000) / safeMaxGeneration));
   const clipPercent = (generationRatio * 100).toFixed(1);
 
-  const titleIcon = snapshot.id === "combined" ? <IconBolt size={26} /> : <IconPlug size={26} />;
+  const titleIcon = snapshot.id === "combined" ? <IconSparkles size={26} /> : <IconPlug size={26} />;
   const statusClass =
     snapshot.status === "ok" ? styles.status : `${styles.status} ${styles.statusError}`;
 
@@ -770,17 +757,6 @@ function Sparkline({ points }: SparklineProps) {
         />
       </LineChart>
     </ResponsiveContainer>
-  );
-}
-function SkeletonGrid() {
-  return (
-    <section className={styles.skeletonGrid}>
-      {Array.from({ length: 3 }).map((_, index) => (
-        <div key={index} className={styles.skeletonCard}>
-          <div className={styles.skeletonPulse} />
-        </div>
-      ))}
-    </section>
   );
 }
 
