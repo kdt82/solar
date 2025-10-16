@@ -117,23 +117,24 @@
 
 @media (max-width: 768px) {
   .propertyFlow {
-    padding: 14px;
-    margin: 10px 0;
+    padding: 0.85rem;
+    margin: 0;
+    border-radius: 14px;
   }
 
   .propertyTitle {
-    font-size: 15px;
-    margin-bottom: 12px;
+    font-size: 1.05rem;
+    margin-bottom: 0.65rem;
   }
 
   .combinedFlow {
-    padding: 20px 14px;
-    margin: 16px 0;
+    padding: 1.15rem 0.85rem;
+    margin: 0;
   }
 
   .combinedTitle {
-    font-size: 18px;
-    margin-bottom: 20px;
+    font-size: 1.25rem;
+    margin-bottom: 1.15rem;
   }
 
   .diagram {
@@ -145,56 +146,57 @@
   }
 
   .label {
-    font-size: 10px;
+    font-size: 0.7rem;
   }
 
   .value {
-    font-size: 12px;
+    font-size: 0.8rem;
   }
 
   .labelLarge {
-    font-size: 11px;
+    font-size: 0.75rem;
   }
 
   .valueLarge {
-    font-size: 14px;
+    font-size: 0.9rem;
   }
 }
 
 @media (max-width: 480px) {
   .propertyFlow {
-    padding: 12px;
-    margin: 8px 0;
+    padding: 0.75rem;
+    margin: 0;
+    border-radius: 12px;
   }
 
   .propertyTitle {
-    font-size: 14px;
-    margin-bottom: 10px;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
   }
 
   .combinedFlow {
-    padding: 16px 12px;
-    margin: 12px 0;
+    padding: 1rem 0.75rem;
+    margin: 0;
   }
 
   .combinedTitle {
-    font-size: 16px;
-    margin-bottom: 16px;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
   }
 
   .label {
-    font-size: 9px;
+    font-size: 0.65rem;
   }
 
   .value {
-    font-size: 11px;
+    font-size: 0.75rem;
   }
 
   .labelLarge {
-    font-size: 10px;
+    font-size: 0.7rem;
   }
 
   .valueLarge {
-    font-size: 13px;
+    font-size: 0.85rem;
   }
 }

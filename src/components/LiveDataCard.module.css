@@ -25,11 +25,61 @@
   margin-bottom: 0.8rem;
 }
 
+.titleWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.rightInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.time {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
 .header h3 {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
   color: var(--text);
+}
+
+.statusIndicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.statusIndicator.online {
+  background: #4ade80;
+  box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+  animation: pulse 2s infinite;
+}
+
+.statusIndicator.offline {
+  background: #f87171;
+  box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.7);
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(74, 222, 128, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0);
+  }
 }
 
 .weather {
@@ -76,34 +126,56 @@
 
 @media (max-width: 768px) {
   .card {
-    padding: 1rem 1.2rem;
+    padding: 0.75rem 1rem;
     max-width: 100%;
+    border-radius: 16px;
+  }
+
+  .header {
+    margin-bottom: 0.5rem;
   }
 
   .header h3 {
-    font-size: 0.95rem;
-  }
-
-  .temp {
     font-size: 0.9rem;
   }
 
+  .statusIndicator {
+    width: 10px;
+    height: 10px;
+  }
+
+  .time {
+    font-size: 0.8rem;
+  }
+
+  .temp {
+    font-size: 0.85rem;
+  }
+
   .icon {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 
   .value {
-    font-size: 0.95rem;
+    font-size: 0.85rem;
   }
 
   .unit {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
   }
 }
 
 @media (max-width: 480px) {
   .card {
-    padding: 0.9rem 1rem;
+    padding: 0.7rem 0.9rem;
+  }
+
+  .rightInfo {
+    gap: 0.4rem;
+  }
+
+  .time {
+    font-size: 0.75rem;
   }
 
   .diagram {

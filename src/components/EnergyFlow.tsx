@@ -13,45 +13,55 @@ interface PropertyEnergyFlowProps {
 export function PropertyEnergyFlow({ label, generation, consumption, grid }: PropertyEnergyFlowProps) {
   const gridDirection = grid < 0 ? "Sell to Grid" : "Buy from Grid";
   const gridColor = grid < 0 ? "#4ade80" : "#f87171";
+  const hasGeneration = generation > 0.01;
+  
+  // Determine if it's night time (simple check based on current hour)
+  const currentHour = new Date().getHours();
+  const isNightTime = currentHour < 6 || currentHour >= 18;
+  const solarIcon = (hasGeneration || !isNightTime) ? "☀️" : "🌙";
 
   return (
     <div className={styles.propertyFlow}>
       <h3 className={styles.propertyTitle}>{label}</h3>
       <svg className={styles.diagram} viewBox="0 0 600 180" preserveAspectRatio="xMidYMid meet">
-        {/* Generation (Sun) */}
-        <circle cx="100" cy="90" r="35" fill="#fbbf24" className={styles.circle} />
-        <text x="100" y="95" textAnchor="middle" dominantBaseline="middle" fontSize="24">☀️</text>
+        {/* Generation (Sun/Moon) */}
+        <circle cx="100" cy="90" r="35" fill="#fbbf24" className={styles.circle} style={{ opacity: hasGeneration ? 1 : 0.3 }} />
+        <text x="100" y="95" textAnchor="middle" dominantBaseline="middle" fontSize="24" style={{ opacity: hasGeneration ? 1 : 0.3 }}>{solarIcon}</text>
         <text x="100" y="140" textAnchor="middle" className={styles.label}>Generation</text>
         <text x="100" y="158" textAnchor="middle" className={styles.value}>{generation.toFixed(2)} kW</text>
 
         {/* Line: Generation to Consumption */}
         <line x1="135" y1="90" x2="245" y2="90" stroke="#e5e7eb" strokeWidth="3" />
         
-        {/* Animated dots: Generation to Consumption */}
-        <motion.circle
-          cx="135"
-          cy="90"
-          r="4"
-          fill="#fbbf24"
-          animate={{ cx: [135, 245] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-        />
-        <motion.circle
-          cx="145"
-          cy="90"
-          r="4"
-          fill="#fbbf24"
-          animate={{ cx: [135, 245] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "linear", delay: 0.4 }}
-        />
-        <motion.circle
-          cx="155"
-          cy="90"
-          r="4"
-          fill="#fbbf24"
-          animate={{ cx: [135, 245] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "linear", delay: 0.8 }}
-        />
+        {/* Animated dots: Generation to Consumption - only show if generating */}
+        {hasGeneration && (
+          <>
+            <motion.circle
+              cx="135"
+              cy="90"
+              r="4"
+              fill="#fbbf24"
+              animate={{ cx: [135, 245] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            />
+            <motion.circle
+              cx="145"
+              cy="90"
+              r="4"
+              fill="#fbbf24"
+              animate={{ cx: [135, 245] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear", delay: 0.4 }}
+            />
+            <motion.circle
+              cx="155"
+              cy="90"
+              r="4"
+              fill="#fbbf24"
+              animate={{ cx: [135, 245] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear", delay: 0.8 }}
+            />
+          </>
+        )}
 
         {/* Consumption (House) */}
         <circle cx="280" cy="90" r="35" fill="#60a5fa" className={styles.circle} />

@@ -32,7 +32,7 @@ import {
 } from "recharts";
 import { usePowerData } from "@/hooks/usePowerData";
 import { useHistoricalMetrics, RANGE_OPTIONS, type RangeKey } from "@/hooks/useHistoricalMetrics";
-import { PropertyEnergyFlow, CombinedEnergyFlow } from "@/components/EnergyFlow";
+import { PropertyEnergyFlow } from "@/components/EnergyFlow";
 import { LiveDataCard } from "@/components/LiveDataCard";
 import { useTheme } from "@/hooks/useTheme";
 import type { DeviceSnapshot, HistoricalSummary } from "@/types/power";
@@ -108,10 +108,14 @@ export default function Home() {
     setRange("24h");
   };
 
+  // Only show skeleton on very first load, not on refreshes
   if (isLoading && !data) {
     return (
       <main className={styles.wrapper}>
-        <SkeletonGrid />
+        {/* Show nothing or minimal loading indicator on first load */}
+        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-soft)' }}>
+          Loading...
+        </div>
       </main>
     );
   }
@@ -172,17 +176,9 @@ export default function Home() {
                 generation={data.combined.generation}
                 consumption={data.combined.consumption}
                 grid={data.combined.grid}
+                isOnline={!error && !isLoading}
               />
             </section>
-          )}
-
-          {/* Combined Energy Flow first */}
-          {data?.combined && (
-            <CombinedEnergyFlow
-              generation={data.combined.generation}
-              consumption={data.combined.consumption}
-              grid={data.combined.grid}
-            />
           )}
 
           {/* Individual Property Flows */}

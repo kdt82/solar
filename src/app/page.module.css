@@ -828,105 +828,110 @@
 
 @media (max-width: 768px) {
   .wrapper {
-    padding: 1rem;
-    gap: 1.5rem;
+    padding: 0.75rem;
+    gap: 0.75rem;
   }
 
   .header {
-    gap: 0.8rem;
+    gap: 0.6rem;
   }
 
   .property {
-    font-size: 2rem;
+    font-size: 1.75rem;
   }
 
   .subtitle {
-    font-size: 0.95rem;
-    gap: 0.5rem;
+    font-size: 0.85rem;
+    gap: 0.4rem;
   }
 
   .actions {
     flex-wrap: wrap;
-    gap: 0.6rem;
+    gap: 0.5rem;
   }
 
   .themeToggle {
-    width: 38px;
-    height: 38px;
-    padding: 0.5rem;
+    width: 36px;
+    height: 36px;
+    padding: 0.45rem;
   }
 
   .refresh {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.85rem;
   }
 
   .grid {
     grid-template-columns: 1fr;
-    gap: 1.2rem;
+    gap: 0.75rem;
   }
 
   .card {
-    padding: 1.4rem;
-    gap: 1.1rem;
+    padding: 1rem;
+    gap: 0.85rem;
+    border-radius: 16px;
   }
 
   .deviceTitle {
-    font-size: 1.35rem;
+    font-size: 1.15rem;
   }
 
   .metrics {
-    gap: 0.85rem;
+    gap: 0.65rem;
   }
 
   .metricLeft {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
 
   .metricValue {
-    font-size: 1.65rem;
+    font-size: 1.4rem;
   }
 
   .metricUnit {
-    font-size: 1rem;
+    font-size: 0.85rem;
   }
 
   .metricIcon {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
   }
 
   .gauge {
-    height: 95px;
+    height: 80px;
   }
 
   .gaugeLabel {
-    font-size: 1.1rem;
+    font-size: 0.95rem;
   }
 
   .energyFlowSection {
-    gap: 1.5rem;
-    margin-top: 0.5rem;
+    gap: 0.75rem;
+    margin-top: 0;
   }
 
   .energyFlowGrid {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
+    gap: 0.75rem;
+  }
+
+  .liveDataSection {
+    margin: 0;
   }
 
   .summarySection {
-    padding: 1.4rem;
-    gap: 1.2rem;
+    padding: 1.2rem;
+    gap: 1rem;
   }
 
   .summaryHeader {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.8rem;
+    gap: 0.6rem;
   }
 
   .summaryHeader h2 {
-    font-size: 1.45rem;
+    font-size: 1.3rem;
   }
 
   .summaryControls {
@@ -939,13 +944,13 @@
   }
 
   .rangeButton {
-    font-size: 0.85rem;
-    padding: 0.42rem 0.9rem;
+    font-size: 0.8rem;
+    padding: 0.38rem 0.8rem;
   }
 
   .summaryGrid {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 0.85rem;
   }
 
   .summaryCard {

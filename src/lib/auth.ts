@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
+  trustHost: true, // Required for production deployments
   session: {
     strategy: "jwt",
     maxAge: 90 * 24 * 60 * 60, // 90 days in seconds
