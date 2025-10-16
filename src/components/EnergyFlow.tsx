@@ -24,13 +24,33 @@ export function PropertyEnergyFlow({ label, generation, consumption, grid }: Pro
         <text x="100" y="140" textAnchor="middle" className={styles.label}>Generation</text>
         <text x="100" y="158" textAnchor="middle" className={styles.value}>{generation.toFixed(2)} kW</text>
 
-        {/* Arrow: Generation to Consumption */}
-        <line x1="135" y1="90" x2="245" y2="90" stroke="#fbbf24" strokeWidth="3" />
-        <motion.polygon
-          points="245,90 235,85 235,95"
+        {/* Line: Generation to Consumption */}
+        <line x1="135" y1="90" x2="245" y2="90" stroke="#e5e7eb" strokeWidth="3" />
+        
+        {/* Animated dots: Generation to Consumption */}
+        <motion.circle
+          cx="135"
+          cy="90"
+          r="4"
           fill="#fbbf24"
-          animate={{ x: [0, 8, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+          animate={{ cx: [135, 245] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+        />
+        <motion.circle
+          cx="145"
+          cy="90"
+          r="4"
+          fill="#fbbf24"
+          animate={{ cx: [135, 245] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear", delay: 0.4 }}
+        />
+        <motion.circle
+          cx="155"
+          cy="90"
+          r="4"
+          fill="#fbbf24"
+          animate={{ cx: [135, 245] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear", delay: 0.8 }}
         />
 
         {/* Consumption (House) */}
@@ -39,14 +59,67 @@ export function PropertyEnergyFlow({ label, generation, consumption, grid }: Pro
         <text x="280" y="140" textAnchor="middle" className={styles.label}>Consumption</text>
         <text x="280" y="158" textAnchor="middle" className={styles.value}>{Math.abs(consumption).toFixed(2)} kW</text>
 
-        {/* Arrow: Consumption to Grid */}
-        <line x1="315" y1="90" x2="445" y2="90" stroke={gridColor} strokeWidth="3" />
-        <motion.polygon
-          points="445,90 435,85 435,95"
-          fill={gridColor}
-          animate={{ x: [0, 8, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
-        />
+        {/* Line: Between Consumption and Grid */}
+        <line x1="315" y1="90" x2="445" y2="90" stroke="#e5e7eb" strokeWidth="3" />
+        
+        {/* Animated dots with direction based on grid flow */}
+        {grid < 0 ? (
+          // Exporting to grid: dots move right (house -> grid)
+          <>
+            <motion.circle
+              cx="315"
+              cy="90"
+              r="4"
+              fill="#4ade80"
+              animate={{ cx: [315, 445] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            />
+            <motion.circle
+              cx="325"
+              cy="90"
+              r="4"
+              fill="#4ade80"
+              animate={{ cx: [315, 445] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear", delay: 0.4 }}
+            />
+            <motion.circle
+              cx="335"
+              cy="90"
+              r="4"
+              fill="#4ade80"
+              animate={{ cx: [315, 445] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear", delay: 0.8 }}
+            />
+          </>
+        ) : (
+          // Importing from grid: dots move left (grid -> house)
+          <>
+            <motion.circle
+              cx="445"
+              cy="90"
+              r="4"
+              fill="#f87171"
+              animate={{ cx: [445, 315] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            />
+            <motion.circle
+              cx="435"
+              cy="90"
+              r="4"
+              fill="#f87171"
+              animate={{ cx: [445, 315] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear", delay: 0.4 }}
+            />
+            <motion.circle
+              cx="425"
+              cy="90"
+              r="4"
+              fill="#f87171"
+              animate={{ cx: [445, 315] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear", delay: 0.8 }}
+            />
+          </>
+        )}
 
         {/* Grid */}
         <circle cx="480" cy="90" r="35" fill={gridColor} className={styles.circle} />
@@ -78,13 +151,33 @@ export function CombinedEnergyFlow({ generation, consumption, grid }: CombinedEn
         <text x="120" y="175" textAnchor="middle" className={styles.labelLarge}>Total Generation</text>
         <text x="120" y="198" textAnchor="middle" className={styles.valueLarge}>{generation.toFixed(2)} kW</text>
 
-        {/* Arrow: Generation to Consumption */}
-        <line x1="165" y1="110" x2="285" y2="110" stroke="#fbbf24" strokeWidth="4" />
-        <motion.polygon
-          points="285,110 273,104 273,116"
+        {/* Line: Generation to Consumption */}
+        <line x1="165" y1="110" x2="285" y2="110" stroke="#e5e7eb" strokeWidth="4" />
+        
+        {/* Animated dots: Generation to Consumption */}
+        <motion.circle
+          cx="165"
+          cy="110"
+          r="5"
           fill="#fbbf24"
-          animate={{ x: [0, 10, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+          animate={{ cx: [165, 285] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+        />
+        <motion.circle
+          cx="175"
+          cy="110"
+          r="5"
+          fill="#fbbf24"
+          animate={{ cx: [165, 285] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear", delay: 0.4 }}
+        />
+        <motion.circle
+          cx="185"
+          cy="110"
+          r="5"
+          fill="#fbbf24"
+          animate={{ cx: [165, 285] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear", delay: 0.8 }}
         />
 
         {/* Consumption (House) */}
@@ -93,14 +186,67 @@ export function CombinedEnergyFlow({ generation, consumption, grid }: CombinedEn
         <text x="330" y="175" textAnchor="middle" className={styles.labelLarge}>Total Consumption</text>
         <text x="330" y="198" textAnchor="middle" className={styles.valueLarge}>{Math.abs(consumption).toFixed(2)} kW</text>
 
-        {/* Arrow: Consumption to Grid */}
-        <line x1="375" y1="110" x2="515" y2="110" stroke={gridColor} strokeWidth="4" />
-        <motion.polygon
-          points="515,110 503,104 503,116"
-          fill={gridColor}
-          animate={{ x: [0, 10, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
-        />
+        {/* Line: Between Consumption and Grid */}
+        <line x1="375" y1="110" x2="515" y2="110" stroke="#e5e7eb" strokeWidth="4" />
+        
+        {/* Animated dots with direction based on grid flow */}
+        {grid < 0 ? (
+          // Exporting to grid: dots move right (house -> grid)
+          <>
+            <motion.circle
+              cx="375"
+              cy="110"
+              r="5"
+              fill="#4ade80"
+              animate={{ cx: [375, 515] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            />
+            <motion.circle
+              cx="385"
+              cy="110"
+              r="5"
+              fill="#4ade80"
+              animate={{ cx: [375, 515] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear", delay: 0.4 }}
+            />
+            <motion.circle
+              cx="395"
+              cy="110"
+              r="5"
+              fill="#4ade80"
+              animate={{ cx: [375, 515] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear", delay: 0.8 }}
+            />
+          </>
+        ) : (
+          // Importing from grid: dots move left (grid -> house)
+          <>
+            <motion.circle
+              cx="515"
+              cy="110"
+              r="5"
+              fill="#f87171"
+              animate={{ cx: [515, 375] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            />
+            <motion.circle
+              cx="505"
+              cy="110"
+              r="5"
+              fill="#f87171"
+              animate={{ cx: [515, 375] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear", delay: 0.4 }}
+            />
+            <motion.circle
+              cx="495"
+              cy="110"
+              r="5"
+              fill="#f87171"
+              animate={{ cx: [515, 375] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear", delay: 0.8 }}
+            />
+          </>
+        )}
 
         {/* Grid */}
         <circle cx="560" cy="110" r="45" fill={gridColor} className={styles.circle} />

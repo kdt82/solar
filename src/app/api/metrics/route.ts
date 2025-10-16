@@ -58,7 +58,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ message: "'from' must be earlier than 'to'" }, { status: 400 });
     }
 
-    const summary = getHistoricalSummary(
+    const summary = await getHistoricalSummary(
       range.from.toISOString(),
       range.to.toISOString(),
       range.label

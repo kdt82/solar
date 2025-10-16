@@ -6,14 +6,25 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "node server.js",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:migrate": "prisma migrate dev",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "create-user": "tsx scripts/create-user.ts",
+    "fix-units": "tsx scripts/fix-snapshot-units.ts",
+    "clear-history": "tsx scripts/clear-historical-data.ts"
   },
   "dependencies": {
+    "@auth/core": "^0.41.0",
+    "@auth/prisma-adapter": "^2.11.0",
+    "@prisma/client": "^6.17.1",
     "@tabler/icons-react": "^3.35.0",
+    "bcryptjs": "^3.0.2",
     "better-sqlite3": "^12.4.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.23.22",
     "next": "15.5.4",
+    "next-auth": "^5.0.0-beta.29",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "recharts": "^2.12.7",
@@ -21,12 +32,15 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/bcryptjs": "^2.4.6",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
+    "prisma": "^6.17.1",
+    "tsx": "^4.20.6",
     "typescript": "^5"
   }
 }

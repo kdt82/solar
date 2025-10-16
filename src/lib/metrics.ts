@@ -1,6 +1,20 @@
 import { parseISO } from "date-fns";
-import { getSnapshotsBetween, type SnapshotRow } from "@/lib/database";
-import type { DeviceHistoricalMetrics, HistoricalSummary, TimelinePoint } from "@/types/power";
+import { getHistoricalMetrics } from "@/lib/database-pg";
+import type { DeviceHistoricalMetrics, HistoricalSummary } from "@/types/power";
+
+type SnapshotRow = {
+  id: string;
+  deviceId: string;
+  timestamp: string;
+  generation: number;
+  consumption: number;
+  grid: number;
+  status: string;
+  error: string | null;
+  device: {
+    label: string;
+  };
+};
 
 type DeviceAccumulator = {
   deviceId: string;
@@ -47,8 +61,31 @@ function accumulateEnergy(previous: SnapshotRow, current: SnapshotRow) {
   };
 }
 
-export function getHistoricalSummary(fromIso: string, toIso: string, label: string): HistoricalSummary {
-  const rows = getSnapshotsBetween(fromIso, toIso);
+export async function getHistoricalSummary(fromIso: string, toIso: string, label: string): Promise<HistoricalSummary> {
+  const snapshots = await getHistoricalMetrics(fromIso, toIso);
+  const rows = snapshots.map((s: { 
+    id: string; 
+    deviceId: string; 
+    timestamp: Date; 
+    generation: number; 
+    consumption: number; 
+    grid: number; 
+    status: string; 
+    error: string | null;
+    device: { label: string };
+  }) => ({
+    id: s.id,
+    deviceId: s.deviceId,
+    timestamp: s.timestamp.toISOString(),
+    generation: s.generation,
+    consumption: s.consumption,
+    grid: s.grid,
+    status: s.status,
+    error: s.error,
+    device: {
+      label: s.device.label,
+    },
+  }));
 
   if (rows.length === 0) {
     return {
@@ -69,14 +106,14 @@ export function getHistoricalSummary(fromIso: string, toIso: string, label: stri
   }
 
   const deviceMap = new Map<string, DeviceAccumulator>();
-  const timelineMap = new Map<string, TimelinePoint>();
+  const timelineMap = new Map<string, { timestamp: string; generation: number; consumption: number; grid: number; deviceCount: number }>();
 
   for (const row of rows) {
     let accumulator = deviceMap.get(row.deviceId);
     if (!accumulator) {
       accumulator = {
         deviceId: row.deviceId,
-        label: row.label,
+        label: row.device.label,
         totalSamples: 0,
         onlineSamples: 0,
         sumGeneration: 0,
@@ -117,10 +154,12 @@ export function getHistoricalSummary(fromIso: string, toIso: string, label: stri
         generation: 0,
         consumption: 0,
         grid: 0,
+        deviceCount: 0,
       };
       bucket.generation += row.generation;
       bucket.consumption += row.consumption;
       bucket.grid += row.grid;
+      bucket.deviceCount += 1;
       timelineMap.set(bucketTime, bucket);
     }
   }
@@ -159,9 +198,16 @@ export function getHistoricalSummary(fromIso: string, toIso: string, label: stri
     0
   );
 
-  const timeline = Array.from(timelineMap.values()).sort((a, b) =>
-    a.timestamp.localeCompare(b.timestamp)
-  );
+  const timeline = Array.from(timelineMap.values())
+    .map(bucket => ({
+      timestamp: bucket.timestamp,
+      // Average the values if multiple devices/samples in same minute bucket
+      generation: bucket.deviceCount > 0 ? bucket.generation / bucket.deviceCount : 0,
+      consumption: bucket.deviceCount > 0 ? bucket.consumption / bucket.deviceCount : 0,
+      grid: bucket.deviceCount > 0 ? bucket.grid / bucket.deviceCount : 0,
+    }))
+    .sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+    
   const peakGeneration = timeline.reduce(
     (max, point) => Math.max(max, point.generation),
     0

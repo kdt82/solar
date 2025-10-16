@@ -1,5 +1,5 @@
 import { getDevices, getPropertyLabel, type FroniusDevice } from "@/config/devices";
-import { ensureDevices, recordSnapshots } from "@/lib/database";
+import { ensureDevices, recordSnapshots } from "@/lib/database-pg";
 import type { DeviceSnapshot, PowerDashboardData } from "@/types/power";
 
 type FroniusRealtimeResponse = {
@@ -74,13 +74,13 @@ export async function getDeviceSnapshot(device: FroniusDevice): Promise<DeviceSn
 }
 
 export async function getAllSnapshots(): Promise<PowerDashboardData> {
-  ensureDevices();
+  await ensureDevices();
 
   const devices = getDevices();
   console.log(`Polling ${devices.length} devices:`, devices.map(d => `${d.id}=${d.url}`).join(', '));
   const results = await Promise.all(devices.map((device) => getDeviceSnapshot(device)));
 
-  recordSnapshots(results);
+  await recordSnapshots(results);
 
   const successful = results.filter((item) => item.status === "ok");
   const allFailed = successful.length === 0;

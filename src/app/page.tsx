@@ -33,11 +33,12 @@ import {
 import { usePowerData } from "@/hooks/usePowerData";
 import { useHistoricalMetrics, RANGE_OPTIONS, type RangeKey } from "@/hooks/useHistoricalMetrics";
 import { PropertyEnergyFlow, CombinedEnergyFlow } from "@/components/EnergyFlow";
+import { LiveDataCard } from "@/components/LiveDataCard";
 import { useTheme } from "@/hooks/useTheme";
 import type { DeviceSnapshot, HistoricalSummary } from "@/types/power";
 import styles from "./page.module.css";
 
-const DEFAULT_MAX_GENERATION = 12000;
+const DEFAULT_MAX_GENERATION = 10000; // 10 kW total (5 kW per system)
 const envMaxGeneration = Number(process.env.NEXT_PUBLIC_MAX_GENERATION);
 const MAX_GENERATION =
   Number.isFinite(envMaxGeneration) && envMaxGeneration > 0
@@ -164,6 +165,17 @@ export default function Home() {
         <ErrorState message="No devices configured yet." onRetry={() => mutate()} />
       ) : (
         <>
+          {/* Live Data Card */}
+          {data?.combined && (
+            <section className={styles.liveDataSection}>
+              <LiveDataCard
+                generation={data.combined.generation}
+                consumption={data.combined.consumption}
+                grid={data.combined.grid}
+              />
+            </section>
+          )}
+
           {/* Combined Energy Flow first */}
           {data?.combined && (
             <CombinedEnergyFlow
@@ -248,14 +260,16 @@ function PowerCard({ snapshot, index }: PowerCardProps) {
   }, [snapshot]);
 
   const safeMaxGeneration = Math.max(MAX_GENERATION, 1);
-  const generationRatio = Math.max(0, Math.min(1, snapshot.generation / safeMaxGeneration));
+  // Data is in kW, so convert MAX_GENERATION (in W) to kW for comparison
+  const generationRatio = Math.max(0, Math.min(1, (snapshot.generation * 1000) / safeMaxGeneration));
   const clipPercent = (generationRatio * 100).toFixed(1);
 
   const titleIcon = snapshot.id === "combined" ? <IconBolt size={26} /> : <IconPlug size={26} />;
   const statusClass =
     snapshot.status === "ok" ? styles.status : `${styles.status} ${styles.statusError}`;
 
-  const generationDisplay = formatPower(snapshot.generation);
+  // Convert kW to W before formatting (data is stored in kW)
+  const generationDisplay = formatPower(snapshot.generation * 1000, true);
 
   return (
     <motion.article
@@ -277,7 +291,8 @@ function PowerCard({ snapshot, index }: PowerCardProps) {
 
       <div className={styles.metrics}>
         {metrics.map((metric) => {
-          const formatted = formatPower(metric.value);
+          // Convert kW to W before formatting (data is stored in kW)
+          const formatted = formatPower(metric.value * 1000, true); // Keep watts, don't convert to kW
           return (
             <div key={metric.label} className={styles.metric}>
               <div className={styles.metricLeft}>
@@ -620,49 +635,51 @@ function DeviceTable({ data }: DeviceTableProps) {
       {rows.length === 0 ? (
         <div className={styles.sparklineEmpty}>No device data captured for this range yet.</div>
       ) : (
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Device</th>
-              <th>Uptime</th>
-              <th>Energy</th>
-              <th>Peak Output</th>
-              <th>Samples</th>
-              <th>Last Seen</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => {
-              const energy = formatEnergy(row.energyGenerated);
-              const peak = formatPower(row.peakGeneration);
-              return (
-                <tr key={row.deviceId}>
-                  <td>
-                    <span className={styles.deviceName}>{row.label}</span>
-                  </td>
-                  <td>
-                    <span className={styles.uptimeValue}>{formatPercent(row.uptimePercent)}</span>
-                  </td>
-                  <td>
-                    {energy.value} <span className={styles.muted}>{energy.unit}</span>
-                  </td>
-                  <td>
-                    {peak.value} <span className={styles.muted}>{peak.unit}</span>
-                  </td>
-                  <td>
-                    {row.totalSamples}
-                    <div className={styles.samplesMeta}>
-                      {row.downtimeSamples > 0
-                        ? `${row.downtimeSamples} offline`
-                        : "Continuous"}
-                    </div>
-                  </td>
-                  <td>{formatDateTime(row.lastSeen)}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Device</th>
+                <th>Uptime</th>
+                <th>Energy</th>
+                <th>Peak Output</th>
+                <th>Samples</th>
+                <th>Last Seen</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => {
+                const energy = formatEnergy(row.energyGenerated);
+                const peak = formatPower(row.peakGeneration);
+                return (
+                  <tr key={row.deviceId}>
+                    <td>
+                      <span className={styles.deviceName}>{row.label}</span>
+                    </td>
+                    <td>
+                      <span className={styles.uptimeValue}>{formatPercent(row.uptimePercent)}</span>
+                    </td>
+                    <td>
+                      {energy.value} <span className={styles.muted}>{energy.unit}</span>
+                    </td>
+                    <td>
+                      {peak.value} <span className={styles.muted}>{peak.unit}</span>
+                    </td>
+                    <td>
+                      {row.totalSamples}
+                      <div className={styles.samplesMeta}>
+                        {row.downtimeSamples > 0
+                          ? `${row.downtimeSamples} offline`
+                          : "Continuous"}
+                      </div>
+                    </td>
+                    <td>{formatDateTime(row.lastSeen)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
@@ -717,6 +734,9 @@ function Sparkline({ points }: SparklineProps) {
   // Show only every nth label to avoid crowding
   const labelInterval = Math.max(0, Math.floor(chartData.length / 6));
 
+  // Use fixed Y-axis scale for 10 kW system (0-12 kW with headroom)
+  const yAxisMax = 12;
+
   return (
     <ResponsiveContainer width="100%" height={250}>
       <LineChart data={chartData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
@@ -730,6 +750,7 @@ function Sparkline({ points }: SparklineProps) {
           height={80}
         />
         <YAxis
+          domain={[0, yAxisMax]}
           label={{ value: "Power (kW)", angle: -90, position: "insideLeft" }}
           tick={{ fontSize: 12, fill: "#666" }}
         />
@@ -782,9 +803,9 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
   );
 }
 
-function formatPower(value: number) {
+function formatPower(value: number, keepWatts = false) {
   const abs = Math.abs(value);
-  if (abs >= 1000) {
+  if (!keepWatts && abs >= 1000) {
     const scaled = value / 1000;
     const digits = Math.abs(scaled) >= 10 ? 1 : 2;
     return { value: scaled.toFixed(digits), unit: "kW" };
