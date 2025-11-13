@@ -48,7 +48,30 @@ if [ "${TAILSCALE_ENABLED:-1}" != "0" ]; then
     exit 1
   fi
   
-  echo "Tailscale is up. Configuring routing..."
+  echo "Tailscale is up. Waiting for connection to establish..."
+  
+  # Wait for Tailscale to fully connect (up to 30 seconds)
+  RETRY_COUNT=0
+  MAX_RETRIES=30
+  while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+    # Check if we can see the subnet router
+    if tailscale status 2>/dev/null | grep -q "solar-subnet-router"; then
+      echo "✓ Tailscale connected! Found subnet router in peer list."
+      break
+    fi
+    
+    RETRY_COUNT=$((RETRY_COUNT + 1))
+    if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+      echo "Waiting for Tailscale connection... ($RETRY_COUNT/$MAX_RETRIES)"
+      sleep 1
+    else
+      echo "⚠ Warning: Subnet router not detected after ${MAX_RETRIES}s, but continuing anyway..."
+      echo "Available peers:"
+      tailscale status 2>&1 || echo "Could not get status"
+    fi
+  done
+  
+  echo "Tailscale connection established. Configuring routing..."
   
   # Show Tailscale status for debugging
   echo ""
