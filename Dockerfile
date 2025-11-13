@@ -19,6 +19,16 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 
+# Install Tailscale
+RUN apk update && apk add --no-cache \
+    ca-certificates \
+    iptables \
+    ip6tables \
+    iproute2 \
+    curl \
+    wget && \
+    curl -fsSL https://tailscale.com/install.sh | sh
+
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
@@ -28,5 +38,9 @@ COPY --from=builder /app/src ./src
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/server.js ./server.js
 
+# Copy and make start.sh executable
+COPY start.sh ./start.sh
+RUN chmod +x ./start.sh
+
 EXPOSE 3000
-CMD ["node", "server.js"]
+CMD ["./start.sh"]
