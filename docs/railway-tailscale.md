@@ -76,9 +76,65 @@ curl --fail http://192.168.50.97/solar_api/GetPowerFlowRealtimeData.fcgi
 
 Successful responses confirm the tailnet path is working. The application logs should also show regular polling without `ECONNREFUSED` or timeout errors.
 
-## 8. Ongoing maintenance tips
+## 8. Troubleshooting
+
+If the Railway deployment can't reach the inverters after setup:
+
+1. **Check Railway logs** for:
+   ```
+   ✓ Tailscale connected! Found subnet router in peer list.
+   [SOCKS5 Test] ✓ SOCKS5 proxy CAN route to subnet!
+   [fetch] ✓ Success: http://192.168.50.X/... - Status: 200
+   ```
+
+2. **Verify Pi connectivity** - SSH to Raspberry Pi:
+   ```bash
+   sudo tailscale status
+   sudo tailscale ping solar-railway-4
+   ```
+
+3. **Check Tailscale admin console**:
+   - All devices show "Connected"
+   - Subnet routes are "Approved"
+   - No devices stuck offline
+
+4. **Common errors**:
+   - `Unexpected non-whitespace character after JSON`: HTTP parsing issue (see troubleshooting guide)
+   - `Failed to send handshake initiation`: Railway can't reach Pi via Tailscale
+   - `Socks5 proxy rejected connection`: Route not approved or Pi unreachable
+
+**For detailed troubleshooting steps, see [`docs/tailscale-troubleshooting.md`](./tailscale-troubleshooting.md)**
+
+### Known Issues & Solutions
+
+#### Issue: Granny Flat inverter returns JSON parse errors
+
+**Symptoms:**
+```
+Error fetching data from http://192.168.50.27: Unexpected non-whitespace character after JSON
+```
+
+**Cause:** The Granny Flat inverter uses HTTP chunked transfer encoding instead of Content-Length headers. This was discovered November 2024.
+
+**Solution:** Ensure `src/lib/fetch.ts` includes chunked encoding support (added in commit `0c60dfa`). This is already fixed in the current codebase.
+
+#### Issue: ISP change causes connectivity loss
+
+**Note:** Despite initial concerns, the November 2024 ISP change did NOT cause connectivity issues. The problem was the chunked encoding bug mentioned above.
+
+Tailscale works reliably across ISP changes because:
+- Uses DERP relays over HTTPS (port 443) as fallback
+- Automatically adapts to NAT changes
+- Maintains connections across network transitions
+
+If you do experience ISP-related issues, see the troubleshooting guide.
+
+---
+
+## 9. Ongoing maintenance tips
 
 - Rotate the Tailscale auth key whenever you rotate other Railway secrets.
 - Keep the Raspberry Pi subnet router online; the Railway node depends on that route advertisement.
 - If you deploy multiple Railway environments (e.g. staging/production), generate distinct auth keys and hostnames per environment.
 - Review Railway logs after upgrades to ensure `tailscale up` still succeeds; failures usually indicate an expired key or changes in ACLs.
+- The custom SOCKS5 fetch implementation (`src/lib/fetch.ts`) supports both Content-Length and chunked transfer encoding.
