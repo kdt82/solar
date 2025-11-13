@@ -3,6 +3,6 @@ builder = "dockerfile"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "node server.js"
+startCommand = "./start.sh"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
