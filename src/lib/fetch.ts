@@ -89,24 +89,43 @@ export function createProxiedFetch(): typeof fetch {
               }
             });
             
-            // Extract body based on Content-Length if present
+            // Extract body based on Content-Length or handle chunked encoding
             const bodyStart = separatorIndex + 4; // Skip "\r\n\r\n"
             let bodyBuffer: Buffer;
             
             if (responseHeaders['content-length']) {
               const contentLength = parseInt(responseHeaders['content-length']);
               bodyBuffer = responseData.subarray(bodyStart, bodyStart + contentLength);
-              console.log(`[fetch] Using Content-Length: ${contentLength}, body starts at ${bodyStart}, total data: ${responseData.length}`);
+            } else if (responseHeaders['transfer-encoding']?.toLowerCase() === 'chunked') {
+              // Handle chunked transfer encoding
+              const chunks: Buffer[] = [];
+              let offset = bodyStart;
+              
+              while (offset < responseData.length) {
+                // Find chunk size line (ends with \r\n)
+                const chunkSizeEnd = responseData.indexOf(Buffer.from('\r\n'), offset);
+                if (chunkSizeEnd === -1) break;
+                
+                const chunkSizeHex = responseData.subarray(offset, chunkSizeEnd).toString('utf-8').trim();
+                const chunkSize = parseInt(chunkSizeHex, 16);
+                
+                if (chunkSize === 0) break; // Last chunk
+                
+                // Extract chunk data
+                const chunkDataStart = chunkSizeEnd + 2; // Skip \r\n
+                const chunkDataEnd = chunkDataStart + chunkSize;
+                chunks.push(responseData.subarray(chunkDataStart, chunkDataEnd));
+                
+                offset = chunkDataEnd + 2; // Skip trailing \r\n after chunk
+              }
+              
+              bodyBuffer = Buffer.concat(chunks);
             } else {
-              // No Content-Length, take everything after headers
+              // No Content-Length or chunked encoding, take everything after headers
               bodyBuffer = responseData.subarray(bodyStart);
-              console.log(`[fetch] No Content-Length header, taking all data from ${bodyStart}, total: ${responseData.length}`);
             }
             
             const bodyString = bodyBuffer.toString('utf-8');
-            
-            // Debug: Show first 100 chars of response for troubleshooting
-            console.log(`[fetch] Response body preview (first 100 chars): ${bodyString.substring(0, 100)}`);
             
             console.log(`[fetch] ✓ Success: ${urlString} - Status: ${status}`);
             
