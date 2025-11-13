@@ -19,15 +19,15 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Install Tailscale
+# Install Tailscale and dependencies
 RUN apk update && apk add --no-cache \
     ca-certificates \
     iptables \
     ip6tables \
     iproute2 \
     curl \
-    wget && \
-    curl -fsSL https://tailscale.com/install.sh | sh
+    wget \
+    tailscale
 
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
