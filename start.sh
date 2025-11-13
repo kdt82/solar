@@ -140,6 +140,17 @@ if [ "${TAILSCALE_ENABLED:-1}" != "0" ]; then
     fi
     
     echo ""
+    echo "[SOCKS5 Test] Testing SOCKS5 proxy directly to subnet..."
+    echo "[SOCKS5 Test] Attempting to reach 192.168.50.97 through SOCKS5 proxy..."
+    if timeout 10 curl -v --socks5 localhost:1055 "http://192.168.50.97/" > /tmp/socks_test.log 2>&1; then
+      echo "[SOCKS5 Test] ✓ SOCKS5 proxy CAN route to subnet!"
+    else
+      echo "[SOCKS5 Test] ✗ SOCKS5 proxy CANNOT route to subnet"
+      echo "[SOCKS5 Test] Error details:"
+      tail -20 /tmp/socks_test.log 2>&1 || echo "No error log available"
+    fi
+    
+    echo ""
     echo "[Connectivity Test] Testing Nelsons House: ${FRONIUS_NELSONS_URL}"
     echo "[Connectivity Test] Using wget with ALL_PROXY=$ALL_PROXY"
     if timeout 10 wget -qO- "${FRONIUS_NELSONS_URL}/solar_api/v1/GetPowerFlowRealtimeData.fcgi" > /dev/null 2>&1; then
