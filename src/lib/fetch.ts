@@ -96,12 +96,17 @@ export function createProxiedFetch(): typeof fetch {
             if (responseHeaders['content-length']) {
               const contentLength = parseInt(responseHeaders['content-length']);
               bodyBuffer = responseData.subarray(bodyStart, bodyStart + contentLength);
+              console.log(`[fetch] Using Content-Length: ${contentLength}, body starts at ${bodyStart}, total data: ${responseData.length}`);
             } else {
               // No Content-Length, take everything after headers
               bodyBuffer = responseData.subarray(bodyStart);
+              console.log(`[fetch] No Content-Length header, taking all data from ${bodyStart}, total: ${responseData.length}`);
             }
             
             const bodyString = bodyBuffer.toString('utf-8');
+            
+            // Debug: Show first 100 chars of response for troubleshooting
+            console.log(`[fetch] Response body preview (first 100 chars): ${bodyString.substring(0, 100)}`);
             
             console.log(`[fetch] ✓ Success: ${urlString} - Status: ${status}`);
             
