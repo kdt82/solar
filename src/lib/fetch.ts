@@ -34,7 +34,8 @@ export function createProxiedFetch(): typeof fetch {
       });
 
       console.log(`[fetch] ✓ Success: ${url} - Status: ${response.status}`);
-      return response as Response;
+      // Return the undici response directly - it's compatible at runtime
+      return response as unknown as Response;
     } catch (error) {
       console.error(`[fetch] ✗ SOCKS5 proxy fetch FAILED for ${url}`);
       console.error(`[fetch] Error type: ${error?.constructor?.name}`);
