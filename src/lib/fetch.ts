@@ -66,12 +66,16 @@ export function createProxiedFetch(): typeof fetch {
         
         socket.on("end", () => {
           try {
-            // Parse HTTP response
-            const responseString = responseData.toString();
-            const [headPart, ...bodyParts] = responseString.split("\r\n\r\n");
-            const bodyString = bodyParts.join("\r\n\r\n");
+            // Find the header/body separator
+            const separatorIndex = responseData.indexOf(Buffer.from("\r\n\r\n"));
+            if (separatorIndex === -1) {
+              throw new Error("Invalid HTTP response: no header/body separator found");
+            }
             
-            const [statusLine, ...headerLines] = headPart.split("\r\n");
+            // Parse headers
+            const headBuffer = responseData.subarray(0, separatorIndex);
+            const headString = headBuffer.toString('utf-8');
+            const [statusLine, ...headerLines] = headString.split("\r\n");
             const statusMatch = statusLine.match(/HTTP\/\d\.\d (\d+)/);
             const status = statusMatch ? parseInt(statusMatch[1]) : 200;
             
@@ -84,6 +88,20 @@ export function createProxiedFetch(): typeof fetch {
                 responseHeaders[key.toLowerCase()] = value;
               }
             });
+            
+            // Extract body based on Content-Length if present
+            const bodyStart = separatorIndex + 4; // Skip "\r\n\r\n"
+            let bodyBuffer: Buffer;
+            
+            if (responseHeaders['content-length']) {
+              const contentLength = parseInt(responseHeaders['content-length']);
+              bodyBuffer = responseData.subarray(bodyStart, bodyStart + contentLength);
+            } else {
+              // No Content-Length, take everything after headers
+              bodyBuffer = responseData.subarray(bodyStart);
+            }
+            
+            const bodyString = bodyBuffer.toString('utf-8');
             
             console.log(`[fetch] ✓ Success: ${urlString} - Status: ${status}`);
             
