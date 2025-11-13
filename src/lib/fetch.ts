@@ -21,8 +21,10 @@ export function createProxiedFetch(): typeof fetch {
 
   // Return a wrapped fetch function that uses undici with the SOCKS proxy
   return async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+    
     try {
-      const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+      console.log(`[fetch] Attempting SOCKS5 proxied request to: ${url}`);
       
       // Use undici's fetch with the dispatcher (agent)
       const response = await undiciFetch(url, {
@@ -31,9 +33,18 @@ export function createProxiedFetch(): typeof fetch {
         dispatcher: agent,
       });
 
+      console.log(`[fetch] ✓ Success: ${url} - Status: ${response.status}`);
       return response as Response;
     } catch (error) {
-      console.error("[fetch] SOCKS5 proxy fetch failed:", error);
+      console.error(`[fetch] ✗ SOCKS5 proxy fetch FAILED for ${url}`);
+      console.error(`[fetch] Error type: ${error?.constructor?.name}`);
+      console.error(`[fetch] Error message: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(`[fetch] Error stack:`, error instanceof Error ? error.stack : 'N/A');
+      
+      if (error && typeof error === 'object') {
+        console.error(`[fetch] Error details:`, JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+      }
+      
       throw error;
     }
   };
