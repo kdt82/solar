@@ -1,6 +1,7 @@
 import { getDevices, getPropertyLabel, type FroniusDevice } from "@/config/devices";
 import { ensureDevices, recordSnapshots } from "@/lib/database-pg";
 import type { DeviceSnapshot, PowerDashboardData } from "@/types/power";
+import { proxiedFetch } from "@/lib/fetch";
 
 type FroniusRealtimeResponse = {
   Head?: Record<string, unknown>;
@@ -27,7 +28,7 @@ export async function getDeviceSnapshot(device: FroniusDevice): Promise<DeviceSn
     const fullUrl = `${device.url}${REALTIME_PATH}`;
     console.log(`[${device.id}] Fetching from: ${fullUrl}`);
     
-    const response = await fetch(fullUrl, {
+    const response = await proxiedFetch(fullUrl, {
       signal: controller.signal,
       headers: device.headers,
     });
