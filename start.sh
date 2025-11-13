@@ -85,10 +85,10 @@ if [ "${TAILSCALE_ENABLED:-1}" != "0" ]; then
     
     echo ""
     echo "[Diagnostic] Finding subnet router..."
-    SUBNET_ROUTER_IP=$(tailscale status --json 2>/dev/null | grep -o '"HostName":"solar-subnet-router".*"TailscaleIPs":\["[^"]*"' | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+' | head -1)
+    SUBNET_ROUTER_IP=$(tailscale status | grep solar-subnet-router | awk '{print $1}')
     
     if [ -n "$SUBNET_ROUTER_IP" ]; then
-      echo "[Diagnostic] Found subnet router at: $SUBNET_ROUTER_IP"
+      echo "[Diagnostic] ✓ Found subnet router at: $SUBNET_ROUTER_IP"
       echo "[Diagnostic] Testing ping to subnet router..."
       if ping -c 2 -W 2 "$SUBNET_ROUTER_IP" > /dev/null 2>&1; then
         echo "[Diagnostic] ✓ Can ping subnet router at $SUBNET_ROUTER_IP"
@@ -99,6 +99,21 @@ if [ "${TAILSCALE_ENABLED:-1}" != "0" ]; then
       echo "[Diagnostic] ✗ Subnet router not found in Tailscale peers!"
       echo "[Diagnostic] Available peers:"
       tailscale status 2>&1 | head -10
+    fi
+    
+    echo ""
+    echo "[Diagnostic] Checking available routes..."
+    echo "[Diagnostic] IP route for 192.168.50.0/24:"
+    ip route | grep "192.168.50" || echo "No route to 192.168.50.0/24 found!"
+    
+    echo ""
+    echo "[Diagnostic] Attempting to reach subnet router directly..."
+    if [ -n "$SUBNET_ROUTER_IP" ]; then
+      if timeout 5 curl -s "http://${SUBNET_ROUTER_IP}:80" > /dev/null 2>&1; then
+        echo "[Diagnostic] ✓ Can reach subnet router via HTTP"
+      else
+        echo "[Diagnostic] ✗ Cannot reach subnet router via HTTP (this is expected, just checking connectivity)"
+      fi
     fi
     
     echo ""
