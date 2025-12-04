@@ -16,6 +16,10 @@ RUN npm run build
 
 FROM node:22-alpine AS runner
 WORKDIR /app
+
+# Install Tailscale and other required tools
+RUN apk add --no-cache tailscale curl wget iputils
+
 ENV NODE_ENV=production
 ENV PORT=3000
 
