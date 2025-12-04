@@ -23,12 +23,12 @@
     "better-sqlite3": "^12.4.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.23.22",
-    "next": "15.5.4",
+    "next": "^15.5.7",
     "next-auth": "^5.0.0-beta.29",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
     "recharts": "^2.12.7",
-    "socks": "^2.8.3",
+    "socks": "^2.8.7",
     "swr": "^2.3.6"
   },
   "devDependencies": {
@@ -39,7 +39,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "15.5.4",
+    "eslint-config-next": "^15.5.7",
     "prisma": "^6.17.1",
     "tsx": "^4.20.6",
     "typescript": "^5"
