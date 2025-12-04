@@ -27,6 +27,9 @@ COPY --from=builder /app/next.config.ts ./next.config.ts
 COPY --from=builder /app/src ./src
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/server.js ./server.js
+COPY --from=builder /app/start.sh ./start.sh
+
+RUN chmod +x ./start.sh
 
 EXPOSE 3000
-CMD ["node", "server.js"]
+CMD ["./start.sh"]
