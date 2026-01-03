@@ -8,7 +8,7 @@ services:
     env_file: ./.env
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.inverter.rule=Host(`inverter.yourdomain.com`)" # CHANGE DOMAIN
+      - "traefik.http.routers.inverter.rule=Host(`solar.bespokeaistudios.online`)"
       - "traefik.http.routers.inverter.entrypoints=https"
       - "traefik.http.routers.inverter.tls.certresolver=letsencrypt"
     networks:
