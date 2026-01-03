@@ -1,0 +1,22 @@
+# Inverter App
+
+services:
+  inverter:
+    build: .
+    container_name: inverter
+    restart: unless-stopped
+    env_file: ./.env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.inverter.rule=Host(`inverter.yourdomain.com`)" # CHANGE DOMAIN
+      - "traefik.http.routers.inverter.entrypoints=https"
+      - "traefik.http.routers.inverter.tls.certresolver=letsencrypt"
+    networks:
+      - proxy
+      - backend
+
+networks:
+  proxy:
+    external: true
+  backend:
+    external: true
