@@ -27,7 +27,7 @@ jobs:
             echo "🚀 Starting deployment..."
             
             # Navigate to project directory
-            cd /opt/apps/solar
+            cd /opt/apps/inverter
             
             # Pull latest code
             echo "📥 Pulling latest code from GitHub..."
