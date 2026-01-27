@@ -92,3 +92,31 @@ model Snapshot {
   @@index([timestamp])
 }
 
+// Alert Settings model for grid import alerts
+model AlertSettings {
+  id              Int      @id @default(autoincrement())
+  enabled         Boolean  @default(false)
+  timeWindowStart String   @default("00:00") // HH:mm format
+  timeWindowEnd   String   @default("23:59") // HH:mm format
+  threshold       Float    @default(2.5) // kW
+  duration        Int      @default(5) // minutes
+  cooldown        Int      @default(15) // minutes
+  speakerGroup    String   @default("media_player.google_home_group")
+  volume          Float    @default(0.5) // 0.0 - 1.0
+  timezone        String   @default("Australia/Sydney")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// Alert Log model for trigger history
+model AlertLog {
+  id        Int      @id @default(autoincrement())
+  timestamp DateTime @default(now())
+  gridValue Float // kW at time of evaluation
+  triggered Boolean // true = alert sent, false = suppressed
+  message   String // reason (e.g., "Alert triggered", "In cooldown")
+  createdAt DateTime @default(now())
+
+  @@index([timestamp])
+}
+

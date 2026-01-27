@@ -15,6 +15,17 @@ services:
       - proxy
       - backend
 
+  inverter-poller:
+    build: .
+    container_name: inverter-poller
+    restart: unless-stopped
+    env_file: ./.env
+    command: ["npx", "tsx", "scripts/alert-poller.ts"]
+    depends_on:
+      - inverter
+    networks:
+      - backend
+
 networks:
   proxy:
     external: true

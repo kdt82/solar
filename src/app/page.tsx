@@ -18,6 +18,8 @@ import {
   IconTrendingUp,
   IconMoon,
   IconSunHigh,
+  IconSettings,
+  IconDashboard,
 } from "@tabler/icons-react";
 import {
   LineChart,
@@ -32,7 +34,9 @@ import { usePowerData } from "@/hooks/usePowerData";
 import { useHistoricalMetrics, RANGE_OPTIONS, type RangeKey } from "@/hooks/useHistoricalMetrics";
 import { PropertyEnergyFlow } from "@/components/EnergyFlow";
 import { LiveDataCard } from "@/components/LiveDataCard";
+import { AlertSettings } from "@/components/AlertSettings";
 import { useTheme } from "@/hooks/useTheme";
+import { useAlertSettings } from "@/hooks/useAlertSettings";
 import type { DeviceSnapshot, HistoricalSummary } from "@/types/power";
 import styles from "./page.module.css";
 
@@ -59,9 +63,21 @@ const cardVariants: Variants = {
 
 export default function Home() {
   const { theme, toggleTheme } = useTheme();
+  const [activeTab, setActiveTab] = useState<"dashboard" | "settings">("dashboard");
   const [range, setRange] = useState<RangeKey>("24h");
   const [customRange, setCustomRange] = useState<{ from?: string; to?: string }>({});
   const { data, error, isLoading, mutate, isValidating } = usePowerData();
+  const {
+    settings: alertSettings,
+    save: saveAlertSettings,
+    test: testAlert,
+    isSaving,
+    isTesting,
+    saveSuccess,
+    testSuccess,
+    saveError,
+    testError,
+  } = useAlertSettings();
   const customFromIso = localDateToIso(customRange.from);
   const customToIso = localDateToIso(customRange.to);
   const metricsParams = {
@@ -135,24 +151,74 @@ export default function Home() {
   return (
     <main className={styles.wrapper}>
       <section className={styles.header}>
+        <div className={styles.tabNavigation}>
+          <button
+            className={`${styles.tab} ${activeTab === "dashboard" ? styles.tabActive : ""}`}
+            onClick={() => setActiveTab("dashboard")}
+          >
+            <IconDashboard size={18} />
+            Dashboard
+          </button>
+          <button
+            className={`${styles.tab} ${activeTab === "settings" ? styles.tabActive : ""}`}
+            onClick={() => setActiveTab("settings")}
+          >
+            <IconSettings size={18} />
+            Settings
+          </button>
+        </div>
         <div className={styles.actions}>
           <button className={styles.themeToggle} onClick={toggleTheme} title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
             {theme === 'light' ? <IconMoon size={20} /> : <IconSunHigh size={20} />}
           </button>
-          <button className={styles.refresh} onClick={() => mutate()}>
-            <motion.span
-              animate={isValidating ? { rotate: 360 } : { rotate: 0 }}
-              transition={{ repeat: isValidating ? Infinity : 0, duration: 1, ease: "linear" }}
-            >
-              <IconRefresh size={18} />
-            </motion.span>
-            Refresh now
-          </button>
-          <span className={styles.subtitle}>Updated {updatedLabel}</span>
+          {activeTab === "dashboard" && (
+            <>
+              <button className={styles.refresh} onClick={() => mutate()}>
+                <motion.span
+                  animate={isValidating ? { rotate: 360 } : { rotate: 0 }}
+                  transition={{ repeat: isValidating ? Infinity : 0, duration: 1, ease: "linear" }}
+                >
+                  <IconRefresh size={18} />
+                </motion.span>
+                Refresh now
+              </button>
+              <span className={styles.subtitle}>Updated {updatedLabel}</span>
+            </>
+          )}
         </div>
       </section>
 
-      {cards.length === 0 ? (
+      {activeTab === "settings" ? (
+        <>
+          <AlertSettings
+            settings={alertSettings}
+            onSave={saveAlertSettings}
+            onTest={testAlert}
+            isSaving={isSaving}
+            isTesting={isTesting}
+          />
+          {saveSuccess && (
+            <div className={styles.toast + " " + styles.toastSuccess}>
+              Settings saved successfully!
+            </div>
+          )}
+          {saveError && (
+            <div className={styles.toast + " " + styles.toastError}>
+              Error: {saveError}
+            </div>
+          )}
+          {testSuccess && (
+            <div className={styles.toast + " " + styles.toastSuccess}>
+              Test alert sent to Google Home speakers!
+            </div>
+          )}
+          {testError && (
+            <div className={styles.toast + " " + styles.toastError}>
+              Error: {testError}
+            </div>
+          )}
+        </>
+      ) : cards.length === 0 ? (
         <ErrorState message="No devices configured yet." onRetry={() => mutate()} />
       ) : (
         <>
@@ -190,22 +256,22 @@ export default function Home() {
               <PowerCard key={snapshot.id} snapshot={snapshot} index={index} />
             ))}
           </section>
+
+          <HistoricalSection
+            data={historical}
+            range={range}
+            customFrom={customRange.from}
+            customTo={customRange.to}
+            onCustomRangeChange={handleCustomRangeChange}
+            onClearCustom={handleClearCustom}
+            onRangeChange={handleRangeChange}
+            isLoading={historicalLoading && !historical}
+            isValidating={historicalValidating}
+            error={historicalError}
+            onRefresh={() => refreshHistorical()}
+          />
         </>
       )}
-
-      <HistoricalSection
-        data={historical}
-        range={range}
-        customFrom={customRange.from}
-        customTo={customRange.to}
-        onCustomRangeChange={handleCustomRangeChange}
-        onClearCustom={handleClearCustom}
-        onRangeChange={handleRangeChange}
-        isLoading={historicalLoading && !historical}
-        isValidating={historicalValidating}
-        error={historicalError}
-        onRefresh={() => refreshHistorical()}
-      />
     </main>
   );
 }
