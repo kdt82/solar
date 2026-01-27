@@ -35,21 +35,21 @@ jobs:
             
             # Stop containers
             echo "🛑 Stopping containers..."
-            docker-compose down
+            docker compose down
             
             # Rebuild and start containers
             echo "🔨 Building and starting containers..."
-            docker-compose up -d --build
+            docker compose up -d --build
             
             # Run database migrations
             echo "🗄️ Running database migrations..."
-            docker-compose exec -T inverter npx prisma migrate deploy
+            docker compose exec -T inverter npx prisma migrate deploy
             
             # Show running containers
             echo "✅ Deployment complete! Running containers:"
-            docker-compose ps
+            docker compose ps
             
             # Show logs for verification
             echo "📋 Recent logs:"
-            docker-compose logs --tail=20 inverter
-            docker-compose logs --tail=20 inverter-poller
+            docker compose logs --tail=20 inverter
+            docker compose logs --tail=20 inverter-poller
