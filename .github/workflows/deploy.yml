@@ -34,13 +34,16 @@ jobs:
             echo "📥 Pulling latest code from GitHub..."
             git pull origin main
             
-            # Stop containers
-            echo "🛑 Stopping containers..."
-            docker compose down
-            
-            # Rebuild and start containers
-            echo "🔨 Building and starting containers..."
-            docker compose up -d --build
+            # Check if package.json changed (requires rebuild)
+            if git diff HEAD@{1} HEAD --name-only | grep -q "package.json\|package-lock.json\|Dockerfile"; then
+              echo "🔨 Dependencies changed - full rebuild required..."
+              docker compose down
+              docker compose build --no-cache
+              docker compose up -d
+            else
+              echo "♻️  Code-only changes - quick restart..."
+              docker compose up -d --force-recreate --no-deps inverter inverter-poller
+            fi
             
             # Run database migrations
             echo "🗄️ Running database migrations..."
