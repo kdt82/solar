@@ -8,9 +8,14 @@
   --positive: #10b981;
   --warning: #f59e0b;
   --danger: #ef4444;
-  --muted: rgba(51, 65, 85, 0.7);
+  --muted: #6b7280;
   --text: #0f172a;
   --text-soft: rgba(51, 65, 85, 0.8);
+  --text-primary: #111827;
+  --card-bg: white;
+  --card-hover: #f3f4f6;
+  --border-color: #e5e7eb;
+  --input-bg: #f9fafb;
   color: var(--text);
   background: #f5f7fa;
 }
@@ -29,6 +34,11 @@
   --muted: rgba(226, 232, 240, 0.68);
   --text: #f8fafc;
   --text-soft: rgba(226, 232, 240, 0.75);
+  --text-primary: #f9fafb;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-hover: rgba(255, 255, 255, 0.1);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --input-bg: rgba(0, 0, 0, 0.2);
   color: var(--text);
   background: #050913;
 }
