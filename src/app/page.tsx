@@ -229,12 +229,20 @@ export default function Home() {
             const granny = data?.devices?.find((d) => d.id === "granny-flat");
             const rawProps = hinenData?.raw_properties;
 
-            // Prefer Hinen live values (Watts); fall back to Fronius kW × 1000
+            // Prefer Hinen live values for solar & battery (Watts); fall back to Fronius kW × 1000
+            // NOTE: Hinen TotalLoadPower & GridTotalPower are WHOLE-PROPERTY values
+            // (the CT clamp is on the mains meter), NOT just Nelson's house.
+            // Use Fronius per-house consumption for individual house loads.
             const nelsonSolarW = rawProps?.GenerationPower ?? (nelson?.generation ?? 0) * 1000;
-            const nelsonLoadW  = rawProps?.TotalLoadPower  ?? (nelson?.consumption ?? 0) * 1000;
+            const nelsonLoadW  = (nelson?.consumption ?? 0) * 1000;  // Fronius per-house
             const batteryW     = rawProps?.BatteryPower    ?? 0;
             const batterySoc   = hinenData?.battery.soc    ?? 0;
-            const nelsonGridW  = rawProps?.GridTotalPower  ?? (nelson?.grid ?? 0) * 1000;
+
+            // Hinen GridTotalPower = total property grid (includes Granny).
+            // Nelson's actual grid = total property grid minus Granny's grid share.
+            const totalPropertyGridW = rawProps?.GridTotalPower ?? (nelson?.grid ?? 0) * 1000;
+            const grannyGridVal      = (granny?.grid ?? 0) * 1000;
+            const nelsonGridW  = totalPropertyGridW - grannyGridVal;
 
             return (
               <section className={styles.energyFlowSection}>
@@ -250,7 +258,7 @@ export default function Home() {
                   batteryCapacityWh={rawProps?.BatCapacity ?? 30720}
                   grannySolarW={(granny?.generation ?? 0) * 1000}
                   grannyLoadW={(granny?.consumption ?? 0) * 1000}
-                  grannyGridW={(granny?.grid ?? 0) * 1000}
+                  grannyGridW={grannyGridVal}
                   grannyDailySolarKwh={0} /* Fronius live API doesn't expose daily totals */
                   grannyDailyImportKwh={0} /* daily totals not in Fronius live API */
                   grannyDailyExportKwh={0} /* daily totals not in Fronius live API */

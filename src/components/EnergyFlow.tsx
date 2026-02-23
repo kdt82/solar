@@ -468,6 +468,9 @@ export function UnifiedEnergyFlow(props: UnifiedEnergyFlowProps) {
           {/* 8. Grid → Battery (horizontal left) */}
           <path id="p-grid-battery" d={`M ${grid.cx-grid.r} ${grid.cy} L ${battery.cx+battery.r} ${battery.cy}`} />
 
+          {/* 9. Battery → Nelson House (up-left diagonal) */}
+          <path id="p-battery-nhouse" d={`M ${battery.cx} ${battery.cy-battery.r} C ${battery.cx} ${battery.cy-battery.r-60} ${nHouse.cx-20} ${nHouse.cy+nHouse.r+60} ${nHouse.cx-20} ${nHouse.cy+nHouse.r}`} />
+
           {/* 9. Grid → Export indicator (horizontal right) */}
           <path id="p-grid-export" d={`M ${grid.cx+grid.r} ${grid.cy} L ${gridExport.cx-45} ${gridExport.cy}`} />
 
@@ -489,9 +492,12 @@ export function UnifiedEnergyFlow(props: UnifiedEnergyFlowProps) {
           <FlowLine pathId="p-grid-nhouse" powerW={gridToNelsonLoad} color="#f87171" dotColor="#fca5a5" />
           <FlowLine pathId="p-grid-ghouse" powerW={grannyGridImportW} color="#f87171" dotColor="#fca5a5" />
 
-          {/* Battery ↔ Grid (horizontal) */}
-          <FlowLine pathId="p-battery-grid" powerW={batteryDischargingW > 0 ? batteryDischargingW : 0} color="#4ade80" dotColor="#86efac" />
+          {/* Battery ↔ Grid (horizontal — only for arbitrage/charging) */}
+          <FlowLine pathId="p-battery-grid" powerW={batteryDischargingW > 0 && nelsonGridExportW > 0 ? Math.min(batteryDischargingW, nelsonGridExportW) : 0} color="#4ade80" dotColor="#86efac" />
           <FlowLine pathId="p-grid-battery" powerW={gridToBattery} color="#60a5fa" dotColor="#93c5fd" />
+
+          {/* Battery → Nelson House (green — battery powering house) */}
+          <FlowLine pathId="p-battery-nhouse" powerW={batteryToNelsonLoad} color="#4ade80" dotColor="#86efac" />
 
           {/* Grid ↔ External: export (green, right) or import (red, left) */}
           <FlowLine pathId="p-grid-export" powerW={nelsonGridExportW + grannyGridExportW} color="#4ade80" dotColor="#86efac" />
