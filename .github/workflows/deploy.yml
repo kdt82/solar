@@ -41,6 +41,21 @@ jobs:
             echo "♻️  Restarting containers..."
             docker compose up -d --remove-orphans
 
+            # Wait for inverter container to be healthy before running migrations
+            echo "⏳ Waiting for inverter container to be ready..."
+            for i in $(seq 1 24); do
+              STATUS=$(docker inspect --format='{{.State.Status}}' inverter 2>/dev/null || echo "missing")
+              if [ "$STATUS" = "running" ]; then
+                # Also check the app is actually responding
+                if docker compose exec -T inverter node -e "process.exit(0)" 2>/dev/null; then
+                  echo "  Container ready after ${i}×5s"
+                  break
+                fi
+              fi
+              echo "  Attempt $i/24 — status: $STATUS, waiting 5s..."
+              sleep 5
+            done
+
             # Run any pending Prisma migrations
             echo "🗄️  Running database migrations..."
             docker compose exec -T inverter npx prisma migrate deploy
