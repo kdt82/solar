@@ -4,56 +4,56 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch: # Allow manual trigger from GitHub UI
 
 jobs:
   deploy:
     name: Deploy to Production VPS
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Deploy to VPS via SSH
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
+          port: 22
           command_timeout: 30m
           script: |
             set -e
-            echo "🚀 Starting deployment..."
-            
-            # Navigate to project directory
+            echo "🚀 Starting deployment — $(date)"
+
             cd /opt/apps/inverter
-            
+
             # Pull latest code
             echo "📥 Pulling latest code from GitHub..."
             git pull origin main
-            
-            # Check if package.json changed (requires rebuild)
-            if git diff HEAD@{1} HEAD --name-only | grep -q "package.json\|package-lock.json\|Dockerfile"; then
-              echo "🔨 Dependencies changed - full rebuild required..."
-              docker compose down
-              docker compose build --no-cache
-              docker compose up -d
-            else
-              echo "♻️  Code-only changes - quick restart..."
-              docker compose up -d --force-recreate --no-deps inverter inverter-poller
-            fi
-            
-            # Run database migrations
-            echo "🗄️ Running database migrations..."
+
+            # Always rebuild — Next.js bakes source code into the image at build time
+            echo "🔨 Building Docker image..."
+            docker compose build --no-cache
+
+            # Bring up new containers (zero-downtime swap for unchanged services)
+            echo "♻️  Restarting containers..."
+            docker compose up -d --remove-orphans
+
+            # Run any pending Prisma migrations
+            echo "🗄️  Running database migrations..."
             docker compose exec -T inverter npx prisma migrate deploy
-            
-            # Show running containers
-            echo "✅ Deployment complete! Running containers:"
+
+            # Cleanup old images to keep disk usage in check
+            echo "🧹 Pruning unused images..."
+            docker image prune -f
+
+            echo ""
+            echo "✅ Deployment complete!"
+            echo ""
             docker compose ps
-            
-            # Show logs for verification
-            echo "📋 Recent logs:"
-            docker compose logs --tail=20 inverter
-            docker compose logs --tail=20 inverter-poller
+            echo ""
+            echo "📋 Recent app logs:"
+            docker compose logs --tail=30 inverter
+

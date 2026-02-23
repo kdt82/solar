@@ -32,8 +32,8 @@ import {
 } from "recharts";
 import { usePowerData } from "@/hooks/usePowerData";
 import { useHistoricalMetrics, RANGE_OPTIONS, type RangeKey } from "@/hooks/useHistoricalMetrics";
-import { PropertyEnergyFlow } from "@/components/EnergyFlow";
-import { LiveDataCard } from "@/components/LiveDataCard";
+import { UnifiedEnergyFlow } from "@/components/EnergyFlow";
+import { useHinenData } from "@/hooks/useHinenData";
 import { AlertSettings } from "@/components/AlertSettings";
 import { useTheme } from "@/hooks/useTheme";
 import { useAlertSettings } from "@/hooks/useAlertSettings";
@@ -67,6 +67,7 @@ export default function Home() {
   const [range, setRange] = useState<RangeKey>("24h");
   const [customRange, setCustomRange] = useState<{ from?: string; to?: string }>({});
   const { data, error, isLoading, mutate, isValidating } = usePowerData();
+  const { data: hinenData } = useHinenData();
   const {
     settings: alertSettings,
     save: saveAlertSettings,
@@ -222,33 +223,45 @@ export default function Home() {
         <ErrorState message="No devices configured yet." onRetry={() => mutate()} />
       ) : (
         <>
-          {/* Live Data Card and Property Flows in same grid */}
-          {(data?.combined || data?.devices) && (
-            <section className={styles.energyFlowSection}>
-              <div className={styles.energyFlowGrid}>
-                {/* Live Data Card */}
-                {data?.combined && (
-                  <LiveDataCard
-                    generation={data.combined.generation}
-                    consumption={data.combined.consumption}
-                    grid={data.combined.grid}
-                    isOnline={!error && !isLoading}
-                  />
-                )}
-                
-                {/* Individual Property Flows */}
-                {data?.devices?.map((device) => (
-                  <PropertyEnergyFlow
-                    key={device.id}
-                    label={device.label}
-                    generation={device.generation}
-                    consumption={device.consumption}
-                    grid={device.grid}
-                  />
-                ))}
-              </div>
-            </section>
-          )}
+          {/* Unified Energy Flow Diagram */}
+          {(data?.combined || data?.devices) && (() => {
+            const nelson = data?.devices?.find((d) => d.id === "nelsons-house");
+            const granny = data?.devices?.find((d) => d.id === "granny-flat");
+            const rawProps = hinenData?.raw_properties;
+
+            // Prefer Hinen live values (Watts); fall back to Fronius kW × 1000
+            const nelsonSolarW = rawProps?.GenerationPower ?? (nelson?.generation ?? 0) * 1000;
+            const nelsonLoadW  = rawProps?.TotalLoadPower  ?? (nelson?.consumption ?? 0) * 1000;
+            const batteryW     = rawProps?.BatteryPower    ?? 0;
+            const batterySoc   = hinenData?.battery.soc    ?? 0;
+            const nelsonGridW  = rawProps?.GridTotalPower  ?? (nelson?.grid ?? 0) * 1000;
+
+            return (
+              <section className={styles.energyFlowSection}>
+                <UnifiedEnergyFlow
+                  nelsonSolarW={nelsonSolarW}
+                  nelsonLoadW={nelsonLoadW}
+                  batteryW={batteryW}
+                  batterySoc={batterySoc}
+                  nelsonGridW={nelsonGridW}
+                  nelsonDailySolarKwh={hinenData?.solar.daily_kwh ?? nelson?.generation ?? 0}
+                  nelsonDailyImportKwh={hinenData?.grid.daily_import_kwh ?? 0}
+                  nelsonDailyExportKwh={hinenData?.grid.daily_export_kwh ?? 0}
+                  batteryCapacityWh={rawProps?.BatCapacity ?? 30720}
+                  grannySolarW={(granny?.generation ?? 0) * 1000}
+                  grannyLoadW={(granny?.consumption ?? 0) * 1000}
+                  grannyGridW={(granny?.grid ?? 0) * 1000}
+                  grannyDailySolarKwh={0} /* Fronius live API doesn't expose daily totals */
+                  grannyDailyImportKwh={0} /* daily totals not in Fronius live API */
+                  grannyDailyExportKwh={0} /* daily totals not in Fronius live API */
+                  nelsonOnline={nelson?.status === "ok"}
+                  grannyOnline={granny?.status === "ok"}
+                  dailyRevenue={hinenData?.revenue.daily_total}
+                  monthlyRevenue={hinenData?.revenue.monthly_total}
+                />
+              </section>
+            );
+          })()}
 
           {/* Data Cards at the bottom */}
           <section className={styles.grid}>

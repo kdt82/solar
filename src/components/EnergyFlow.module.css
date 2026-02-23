@@ -1,202 +1,228 @@
-.propertyFlow {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  margin: 16px 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
+/* ── Unified Energy Flow ────────────────────────────────────────────────────── */
 
-:root[data-theme="dark"] .propertyFlow {
-  background: linear-gradient(150deg, rgba(15, 23, 42, 0.85), rgba(17, 24, 39, 0.65));
-  border: 1px solid rgba(93, 123, 255, 0.18);
-  box-shadow: 0 8px 24px rgba(8, 12, 26, 0.55);
-}
-
-.propertyTitle {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0 0 16px 0;
-  text-align: center;
-}
-
-:root[data-theme="dark"] .propertyTitle {
-  color: #f8fafc;
-}
-
-.combinedFlow {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-  border-radius: 16px;
-  padding: 32px 24px;
-  margin: 24px 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-:root[data-theme="dark"] .combinedFlow {
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.2) 0%, rgba(59, 130, 246, 0.15) 100%);
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  box-shadow: 0 8px 24px rgba(14, 165, 233, 0.25);
-}
-
-.combinedTitle {
-  font-size: 24px;
-  font-weight: 700;
-  color: #0f172a;
+.unifiedFlow {
+  border-radius: 20px;
+  overflow: hidden;
+  background: linear-gradient(160deg, rgba(15, 23, 42, 0.98) 0%, rgba(10, 18, 40, 0.98) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.04);
   margin: 0 0 24px 0;
-  text-align: center;
 }
 
-:root[data-theme="dark"] .combinedTitle {
-  color: #f8fafc;
+:root[data-theme="light"] .unifiedFlow {
+  background: linear-gradient(160deg, #0f172a 0%, #0d1a38 100%);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-.diagram {
-  width: 100%;
-  max-width: 600px;
-  height: auto;
-  margin: 0 auto;
-  display: block;
+.unifiedHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 18px 24px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.diagramLarge {
-  width: 100%;
-  max-width: 700px;
-  height: auto;
-  margin: 0 auto;
-  display: block;
-}
-
-.circle {
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
-  transition: all 0.3s ease;
-}
-
-.circle:hover {
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.25));
-}
-
-.label {
-  font-size: 13px;
-  font-weight: 500;
-  fill: #4b5563;
-}
-
-:root[data-theme="dark"] .label {
-  fill: #94a3b8;
-}
-
-.value {
-  font-size: 15px;
+.unifiedTitle {
+  font-size: 1.1rem;
   font-weight: 700;
-  fill: #1f2937;
+  color: #f1f5f9;
+  margin: 0;
+  letter-spacing: 0.02em;
 }
 
-:root[data-theme="dark"] .value {
-  fill: #f1f5f9;
+.unifiedStats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-.labelLarge {
-  font-size: 14px;
+.statPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.78rem;
   font-weight: 600;
-  fill: #374151;
+  color: #f1f5f9;
+  white-space: nowrap;
 }
 
-:root[data-theme="dark"] .labelLarge {
-  fill: #cbd5e1;
+.unifiedDiagram {
+  width: 100%;
+  height: auto;
+  display: block;
+  padding: 8px 0 4px;
 }
 
-.valueLarge {
-  font-size: 18px;
-  font-weight: 800;
-  fill: #111827;
+/* SVG text styles — applied via className on SVG text elements */
+.nodeLabel {
+  font-size: 12px;
+  font-weight: 600;
+  fill: #94a3b8;
+  font-family: inherit;
 }
 
-:root[data-theme="dark"] .valueLarge {
-  fill: #f8fafc;
+.nodeValue {
+  font-size: 14px;
+  font-weight: 700;
+  fill: #f1f5f9;
+  font-family: inherit;
 }
+
+.nodeSub {
+  font-size: 11px;
+  font-weight: 500;
+  fill: #64748b;
+  font-family: inherit;
+}
+
+.combinedBadge {
+  font-size: 12px;
+  font-weight: 700;
+  fill: #fde68a;
+  font-family: inherit;
+  letter-spacing: 0.03em;
+}
+
+/* ── Stats bar ─────────────────────────────────────────────────────────────── */
+
+.statsRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  flex-wrap: wrap;
+}
+
+.statItem {
+  flex: 1 1 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 14px 20px 16px;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  min-width: 0;
+}
+
+.statItem:last-child {
+  border-right: none;
+}
+
+.statLabel {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.statValue {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  line-height: 1.1;
+}
+
+.statMeta {
+  font-size: 0.7rem;
+  color: #475569;
+  line-height: 1.3;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
 
 @media (max-width: 768px) {
-  .propertyFlow {
-    padding: 0.85rem;
-    margin: 0;
-    border-radius: 14px;
+  .unifiedHeader {
+    padding: 14px 16px 12px;
+    flex-direction: column;
+    align-items: flex-start;
   }
 
-  .propertyTitle {
-    font-size: 1.05rem;
-    margin-bottom: 0.65rem;
+  .unifiedTitle {
+    font-size: 1rem;
   }
 
-  .combinedFlow {
-    padding: 1.15rem 0.85rem;
-    margin: 0;
+  .statPill {
+    font-size: 0.72rem;
+    padding: 3px 9px;
   }
 
-  .combinedTitle {
-    font-size: 1.25rem;
-    margin-bottom: 1.15rem;
+  .unifiedDiagram {
+    padding: 4px 0 2px;
   }
 
-  .diagram {
-    max-width: 100%;
+  .nodeLabel {
+    font-size: 10px;
   }
 
-  .diagramLarge {
-    max-width: 100%;
+  .nodeValue {
+    font-size: 12px;
   }
 
-  .label {
-    font-size: 0.7rem;
+  .nodeSub {
+    font-size: 9.5px;
   }
 
-  .value {
-    font-size: 0.8rem;
+  .combinedBadge {
+    font-size: 10.5px;
   }
 
-  .labelLarge {
-    font-size: 0.75rem;
+  .statsRow {
+    flex-wrap: wrap;
   }
 
-  .valueLarge {
-    font-size: 0.9rem;
+  .statItem {
+    flex: 1 1 calc(50% - 1px);
+    padding: 12px 14px 14px;
+  }
+
+  .statItem:nth-child(even) {
+    border-right: none;
+  }
+
+  .statValue {
+    font-size: 0.95rem;
   }
 }
 
 @media (max-width: 480px) {
-  .propertyFlow {
-    padding: 0.75rem;
-    margin: 0;
-    border-radius: 12px;
+  .unifiedFlow {
+    border-radius: 14px;
+    margin: 0 0 16px 0;
   }
 
-  .propertyTitle {
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
+  .unifiedHeader {
+    padding: 12px 14px 10px;
   }
 
-  .combinedFlow {
-    padding: 1rem 0.75rem;
-    margin: 0;
+  .statItem {
+    flex: 1 1 100%;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 10px 14px 12px;
   }
 
-  .combinedTitle {
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
+  .statItem:last-child {
+    border-bottom: none;
   }
 
-  .label {
-    font-size: 0.65rem;
+  .nodeLabel {
+    font-size: 9px;
   }
 
-  .value {
-    font-size: 0.75rem;
+  .nodeValue {
+    font-size: 10.5px;
   }
 
-  .labelLarge {
-    font-size: 0.7rem;
-  }
-
-  .valueLarge {
-    font-size: 0.85rem;
+  .nodeSub {
+    font-size: 8.5px;
   }
 }
