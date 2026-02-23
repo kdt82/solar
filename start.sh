@@ -44,8 +44,8 @@ if [ "${TAILSCALE_ENABLED:-1}" != "0" ]; then
 
   # shellcheck disable=SC2086 # intentional splitting of TS_FLAGS into words
   if ! tailscale up ${TS_FLAGS}; then
-    echo "tailscale up failed; exiting" >&2
-    exit 1
+    echo "tailscale up failed; continuing without Tailscale (local device data will be unavailable)" >&2
+    TAILSCALE_ENABLED=0
   fi
   
   echo "Tailscale is up. Waiting for connection to establish..."
