@@ -3,15 +3,16 @@
 .unifiedFlow {
   border-radius: 20px;
   overflow: hidden;
-  background: linear-gradient(160deg, rgba(15, 23, 42, 0.98) 0%, rgba(10, 18, 40, 0.98) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
   margin: 0 0 24px 0;
 }
 
-:root[data-theme="light"] .unifiedFlow {
-  background: linear-gradient(160deg, #0f172a 0%, #0d1a38 100%);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+:root[data-theme="dark"] .unifiedFlow {
+  background: linear-gradient(160deg, rgba(15, 23, 42, 0.98) 0%, rgba(10, 18, 40, 0.98) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 .unifiedHeader {
@@ -21,13 +22,13 @@
   flex-wrap: wrap;
   gap: 10px;
   padding: 18px 24px 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--panel-border);
 }
 
 .unifiedTitle {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #f1f5f9;
+  color: var(--text);
   margin: 0;
   letter-spacing: 0.02em;
 }
@@ -48,7 +49,7 @@
   border: 1px solid transparent;
   font-size: 0.78rem;
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--text);
   white-space: nowrap;
 }
 
@@ -63,30 +64,34 @@
 .nodeLabel {
   font-size: 12px;
   font-weight: 600;
-  fill: #94a3b8;
+  fill: var(--text-soft, #94a3b8);
   font-family: inherit;
 }
 
 .nodeValue {
   font-size: 14px;
   font-weight: 700;
-  fill: #f1f5f9;
+  fill: var(--text, #f1f5f9);
   font-family: inherit;
 }
 
 .nodeSub {
   font-size: 11px;
   font-weight: 500;
-  fill: #64748b;
+  fill: var(--muted, #64748b);
   font-family: inherit;
 }
 
 .combinedBadge {
   font-size: 12px;
   font-weight: 700;
-  fill: #fde68a;
+  fill: #d97706;
   font-family: inherit;
   letter-spacing: 0.03em;
+}
+
+:root[data-theme="dark"] .combinedBadge {
+  fill: #fde68a;
 }
 
 /* ── Stats bar ─────────────────────────────────────────────────────────────── */
@@ -95,7 +100,7 @@
   display: flex;
   align-items: flex-start;
   gap: 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--panel-border);
   flex-wrap: wrap;
 }
 
@@ -105,7 +110,7 @@
   flex-direction: column;
   gap: 3px;
   padding: 14px 20px 16px;
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: 1px solid var(--panel-border);
   min-width: 0;
 }
 
@@ -116,7 +121,7 @@
 .statLabel {
   font-size: 0.7rem;
   font-weight: 500;
-  color: #64748b;
+  color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   white-space: nowrap;
@@ -127,13 +132,13 @@
 .statValue {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #f1f5f9;
+  color: var(--text);
   line-height: 1.1;
 }
 
 .statMeta {
   font-size: 0.7rem;
-  color: #475569;
+  color: var(--text-soft);
   line-height: 1.3;
 }
 

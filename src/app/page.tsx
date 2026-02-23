@@ -307,7 +307,7 @@ function PowerCard({ snapshot, index }: PowerCardProps) {
       },
       {
         label: snapshot.id === "combined" ? "Total Consumption" : "Property Consumption",
-        value: snapshot.consumption,
+        value: Math.abs(snapshot.consumption),
         icon: <IconHome2 size={20} />,
         accent: "var(--accent)",
       },

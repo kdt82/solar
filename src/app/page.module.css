@@ -149,6 +149,10 @@
   box-shadow: 0 12px 28px rgba(56, 212, 197, 0.2);
 }
 
+.energyFlowSection {
+  /* wrapper for the UnifiedEnergyFlow card — no extra padding, full width */
+}
+
 .grid {
   display: grid;
   gap: 1.8rem;
