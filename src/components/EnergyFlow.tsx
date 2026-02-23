@@ -291,14 +291,13 @@ function HouseNode({ cx, cy, r, loadW, label, online, fromSolarW, fromBatteryW, 
 // ── Combined solar badge ──────────────────────────────────────────────────────
 
 function CombinedSolarBadge({ cx, cy, totalW }: { cx: number; cy: number; totalW: number }) {
-  if (totalW < 15) return null;
   return (
     <g>
-      <text x={cx} y={cy} textAnchor="middle" className={styles.combinedTitle} fontSize={22} fontWeight="bold" fill="var(--text)">
-        {fmtW(totalW)}
+      <text x={cx} y={cy} textAnchor="middle" fontSize={24} fontWeight="800" fill="var(--text)" letterSpacing="0.04em">
+        {totalW > 15 ? fmtW(totalW) : "0 W"}
       </text>
-      <text x={cx} y={cy + 24} textAnchor="middle" className={styles.combinedSub} fontSize={14} fontWeight="500" fill="var(--text-soft)">
-        Total Solar Generation
+      <text x={cx} y={cy + 22} textAnchor="middle" fontSize={13} fontWeight="600" fill="var(--text-soft)" letterSpacing="0.03em">
+        TOTAL KW BOTH HOUSES
       </text>
     </g>
   );
@@ -363,26 +362,24 @@ export function UnifiedEnergyFlow(props: UnifiedEnergyFlowProps) {
   const totalSolarW = nelsonSolarW + grannySolarW;
   const combinedGridW = nelsonGridW + grannyGridW;
 
-  // ── Node layout (viewBox 870×570) ──────────────────────────────────────────
-  // Top Row: Solar
-  const nSolar   = { cx: 200, cy: 90,  r: 52 };
-  const gSolar   = { cx: 670, cy: 90,  r: 52 };
+  // ── Node layout (viewBox 870×630) ──────────────────────────────────────────
+  // Top Row: Solar panels (left & right)
+  const nSolar   = { cx: 200, cy: 90,  r: 48 };
+  const gSolar   = { cx: 670, cy: 90,  r: 48 };
   
-  // Middle Row: Houses (directly under panels)
-  const nHouse   = { cx: 200, cy: 280, r: 52 };
-  const gHouse   = { cx: 670, cy: 280, r: 52 };
+  // Middle Row: Houses (slightly inward, under panels)
+  const nHouse   = { cx: 245, cy: 280, r: 48 };
+  const gHouse   = { cx: 625, cy: 280, r: 48 };
 
-  // Bottom Row: Battery (left), Grid (right)
-  const battery  = { cx: 200, cy: 470, r: 52 };
-  const grid     = { cx: 670, cy: 470, r: 52 };
-  
-  // Center Title Position
-  const titlePos = { cx: 435, cy: 95 };
+  // Bottom Row: Battery (left), Grid (CENTER), Export indicator (right)
+  const battery  = { cx: 145, cy: 500, r: 48 };
+  const grid     = { cx: 435, cy: 500, r: 48 };
+  const gridExport = { cx: 725, cy: 500 };
 
   return (
     <div className={styles.unifiedFlow}>
       <div className={styles.unifiedHeader}>
-        <h2 className={styles.unifiedTitle}>Live Energy Flow</h2>
+        <h2 className={styles.unifiedTitle}>5 Oxford Road, Dapto NSW</h2>
         <div className={styles.unifiedStats}>
           <span className={styles.statPill} style={{
             background: batterySoc > 60 ? "rgba(74,222,128,0.15)" : batterySoc > 25 ? "rgba(251,191,36,0.15)" : "rgba(248,113,113,0.15)",
@@ -407,7 +404,7 @@ export function UnifiedEnergyFlow(props: UnifiedEnergyFlowProps) {
         </div>
       </div>
 
-      <svg className={styles.unifiedDiagram} viewBox="0 0 870 570" preserveAspectRatio="xMidYMid meet">
+      <svg className={styles.unifiedDiagram} viewBox="0 0 870 630" preserveAspectRatio="xMidYMid meet">
         <defs>
           {/* Gradients */}
           <radialGradient id="grad-solar" cx="50%" cy="50%" r="50%">
@@ -439,57 +436,61 @@ export function UnifiedEnergyFlow(props: UnifiedEnergyFlowProps) {
             <feDropShadow dx="0" dy="3" stdDeviation="6" floodColor="rgba(0,0,0,0.5)" />
           </filter>
 
-          {/* Flow paths — New Layout (2x3 Grid) */}
+          {/* Flow paths — Matching reference layout */}
           
-          {/* 1. Nelson Solar → Nelson House (Straight Down) */}
-          <path id="p-nsolar-nhouse" d={`M ${nSolar.cx} ${nSolar.cy+nSolar.r} L ${nHouse.cx} ${nHouse.cy-nHouse.r}`} />
+          {/* 1. Nelson Solar → Nelson House (diagonal down) */}
+          <path id="p-nsolar-nhouse" d={`M ${nSolar.cx} ${nSolar.cy+nSolar.r} C ${nSolar.cx} ${nSolar.cy+nSolar.r+40} ${nHouse.cx} ${nHouse.cy-nHouse.r-40} ${nHouse.cx} ${nHouse.cy-nHouse.r}`} />
           
-          {/* 2. Granny Solar → Granny Flat (Straight Down) */}
-          <path id="p-gsolar-ghouse" d={`M ${gSolar.cx} ${gSolar.cy+gSolar.r} L ${gHouse.cx} ${gHouse.cy-gHouse.r}`} />
+          {/* 2. Granny Solar → Granny Flat (diagonal down) */}
+          <path id="p-gsolar-ghouse" d={`M ${gSolar.cx} ${gSolar.cy+gSolar.r} C ${gSolar.cx} ${gSolar.cy+gSolar.r+40} ${gHouse.cx} ${gHouse.cy-gHouse.r-40} ${gHouse.cx} ${gHouse.cy-gHouse.r}`} />
 
-          {/* 3. Battery ⟷ Nelson House (Straight Vertical) */}
-          <path id="p-battery-nhouse" d={`M ${battery.cx} ${battery.cy-battery.r} L ${nHouse.cx} ${nHouse.cy+nHouse.r}`} />
+          {/* 3. Nelson House → Grid (diagonal down to center) */}
+          <path id="p-nhouse-grid" d={`M ${nHouse.cx} ${nHouse.cy+nHouse.r} C ${nHouse.cx} ${nHouse.cy+nHouse.r+60} ${grid.cx-40} ${grid.cy-grid.r-60} ${grid.cx-20} ${grid.cy-grid.r}`} />
 
-          {/* 4. Grid ⟷ Granny Flat (Straight Vertical) */}
-          <path id="p-grid-ghouse" d={`M ${grid.cx} ${grid.cy-grid.r} L ${gHouse.cx} ${gHouse.cy+gHouse.r}`} />
+          {/* 4. Granny Flat → Grid (diagonal down to center) */}
+          <path id="p-ghouse-grid" d={`M ${gHouse.cx} ${gHouse.cy+gHouse.r} C ${gHouse.cx} ${gHouse.cy+gHouse.r+60} ${grid.cx+40} ${grid.cy-grid.r-60} ${grid.cx+20} ${grid.cy-grid.r}`} />
 
-          {/* 5. Nelson House ⟷ Grid (Cross connection) */} 
-          <path id="p-grid-nhouse" d={`M ${grid.cx-grid.r} ${grid.cy} C ${grid.cx-100} ${grid.cy} ${nHouse.cx+100} ${nHouse.cy+nHouse.r+20} ${nHouse.cx+30} ${nHouse.cy+nHouse.r}`} />
+          {/* 5. Grid → Nelson House (reverse for import) */}
+          <path id="p-grid-nhouse" d={`M ${grid.cx-20} ${grid.cy-grid.r} C ${grid.cx-40} ${grid.cy-grid.r-60} ${nHouse.cx} ${nHouse.cy+nHouse.r+60} ${nHouse.cx} ${nHouse.cy+nHouse.r}`} />
 
-           {/* 6. Battery ⟷ Grid (Bottom horizontal connection) */}
-           <path id="p-battery-grid" d={`M ${battery.cx+battery.r} ${battery.cy} L ${grid.cx-grid.r} ${grid.cy}`} />
+          {/* 6. Grid → Granny Flat (reverse for import) */}
+          <path id="p-grid-ghouse" d={`M ${grid.cx+20} ${grid.cy-grid.r} C ${grid.cx+40} ${grid.cy-grid.r-60} ${gHouse.cx} ${gHouse.cy+gHouse.r+60} ${gHouse.cx} ${gHouse.cy+gHouse.r}`} />
 
-           {/* 7. Grid ⟷ Battery (Reciprocal path) */}
-           <path id="p-grid-battery" d={`M ${grid.cx-grid.r} ${grid.cy} L ${battery.cx+battery.r} ${battery.cy}`} />
+          {/* 7. Battery → Grid (horizontal right) */}
+          <path id="p-battery-grid" d={`M ${battery.cx+battery.r} ${battery.cy} L ${grid.cx-grid.r} ${grid.cy}`} />
+
+          {/* 8. Grid → Battery (horizontal left) */}
+          <path id="p-grid-battery" d={`M ${grid.cx-grid.r} ${grid.cy} L ${battery.cx+battery.r} ${battery.cy}`} />
+
+          {/* 9. Grid → Export indicator (horizontal right) */}
+          <path id="p-grid-export" d={`M ${grid.cx+grid.r} ${grid.cy} L ${gridExport.cx-45} ${gridExport.cy}`} />
         </defs>
 
         {/* ── Flow lines (below nodes) ── */}
         <g>
-          {/* Generation Flows (Amber) */}
+          {/* Solar → Houses (Amber) */}
           <FlowLine pathId="p-nsolar-nhouse" powerW={nelsonSolarW} color="#f59e0b" dotColor="#fde68a" />
           <FlowLine pathId="p-gsolar-ghouse" powerW={grannySolarW} color="#f59e0b" dotColor="#fde68a" />
 
-          {/* Battery Flows (Green for discharge, Blue for charge) */}
-          {/* Battery powering house */}
-          <FlowLine pathId="p-battery-nhouse" powerW={batteryToNelsonLoad} color="#4ade80" dotColor="#86efac" />
-          
-          {/* Grid Flows */}
-          {/* Grid providing power to Granny (Red) */}
-          <FlowLine pathId="p-grid-ghouse" powerW={grannyGridImportW} color="#f87171" dotColor="#fca5a5" />
-          {/* Granny exporting to Grid (Green) */}
-          <FlowLine pathId="p-grid-ghouse" powerW={-grannyGridExportW} color="#4ade80" dotColor="#86efac" />
+          {/* Houses → Grid: export (Green) */}
+          <FlowLine pathId="p-nhouse-grid" powerW={nelsonGridExportW} color="#4ade80" dotColor="#86efac" />
+          <FlowLine pathId="p-ghouse-grid" powerW={grannyGridExportW} color="#4ade80" dotColor="#86efac" />
 
-          {/* Cross House Flows & Battery Grid arbitrage */}
-           
-          {/* Grid to Nelson House (Red) */}
+          {/* Grid → Houses: import (Red) */}
           <FlowLine pathId="p-grid-nhouse" powerW={gridToNelsonLoad} color="#f87171" dotColor="#fca5a5" />
-          
-          {/* Battery <-> Grid */}
-          {/* Discharge to grid */}
-          <FlowLine pathId="p-battery-grid" powerW={batteryDischargingW > 0 && nelsonGridExportW > 0 ? Math.min(batteryDischargingW, nelsonGridExportW) : 0} color="#4ade80" dotColor="#86efac" />
-          {/* Charge from grid */}
+          <FlowLine pathId="p-grid-ghouse" powerW={grannyGridImportW} color="#f87171" dotColor="#fca5a5" />
+
+          {/* Battery ↔ Grid (horizontal) */}
+          <FlowLine pathId="p-battery-grid" powerW={batteryDischargingW > 0 ? batteryDischargingW : 0} color="#4ade80" dotColor="#86efac" />
           <FlowLine pathId="p-grid-battery" powerW={gridToBattery} color="#60a5fa" dotColor="#93c5fd" />
+
+          {/* Grid → Export indicator */}
+          <FlowLine pathId="p-grid-export" powerW={nelsonGridExportW + grannyGridExportW} color="#4ade80" dotColor="#86efac" />
         </g>
+
+        {/* ── "Usage in kW" labels on House→Grid connections ── */}
+        <text x={335} y={395} textAnchor="middle" className={styles.nodeSub} fontSize={11}>Usage in kW</text>
+        <text x={535} y={395} textAnchor="middle" className={styles.nodeSub} fontSize={11}>Usage in kW</text>
 
         {/* ── Nodes (above flows) ── */}
         <g filter="url(#node-shadow)">
@@ -511,8 +512,27 @@ export function UnifiedEnergyFlow(props: UnifiedEnergyFlowProps) {
           />
         </g>
 
-        {/* ── Combined Title ── */}
-        <CombinedSolarBadge cx={titlePos.cx} cy={titlePos.cy} totalW={totalSolarW} />
+        {/* ── Grid Export Indicator (bottom-right) ── */}
+        <g>
+          {/* Power line tower icon */}
+          <g transform={`translate(${gridExport.cx},${gridExport.cy - 3})`} stroke="var(--text-soft, #94a3b8)" strokeWidth={2} fill="none" strokeLinecap="round">
+            <line x1={0} y1={-22} x2={0} y2={22} />
+            <line x1={-18} y1={-14} x2={18} y2={-14} />
+            <line x1={-12} y1={2} x2={12} y2={2} />
+            <line x1={0} y1={22} x2={-14} y2={25} />
+            <line x1={0} y1={22} x2={14} y2={25} />
+            <path d="M -18,-14 Q -22,-6 -18,2" strokeWidth={1.5} />
+            <path d="M 18,-14 Q 22,-6 18,2" strokeWidth={1.5} />
+          </g>
+          <text x={gridExport.cx} y={gridExport.cy + 40} textAnchor="middle" className={styles.nodeValue} style={{ fill: (nelsonGridExportW + grannyGridExportW) > 10 ? '#4ade80' : 'var(--text-soft)' }}>
+            {fmtW(nelsonGridExportW + grannyGridExportW)}
+          </text>
+          <text x={gridExport.cx} y={gridExport.cy + 57} textAnchor="middle" className={styles.nodeSub}>Being Sent</text>
+          <text x={gridExport.cx} y={gridExport.cy + 71} textAnchor="middle" className={styles.nodeSub}>to Grid</text>
+        </g>
+
+        {/* ── Combined Title (center top) ── */}
+        <CombinedSolarBadge cx={435} cy={70} totalW={totalSolarW} />
 
         {/* Max charge indicator */}
         {batteryChargingW > 4500 && (
