@@ -132,10 +132,10 @@ function SolarNode({ cx, cy, r, powerW, label, dailyKwh }: SolarNodeProps) {
         <line x1={ri * 0.45} y1={-ri * 0.7} x2={ri * 0.45} y2={ri * 0.7} stroke="rgba(0,0,0,0.18)" strokeWidth={1.2} />
         <line x1={-ri * 0.85} y1={0} x2={ri * 0.85} y2={0} stroke="rgba(0,0,0,0.18)" strokeWidth={1.2} />
       </g>
-      <text x={cx} y={cy + r + 19} textAnchor="middle" className={styles.nodeLabel}>{label}</text>
-      <text x={cx} y={cy + r + 37} textAnchor="middle" className={styles.nodeValue}>{fmtW(powerW)}</text>
+      <text x={cx} y={cy + r + 16} textAnchor="middle" className={styles.nodeLabel}>{label}</text>
+      <text x={cx} y={cy + r + 32} textAnchor="middle" className={styles.nodeValue}>{fmtW(powerW)}</text>
       {dailyKwh > 0 && (
-        <text x={cx} y={cy + r + 53} textAnchor="middle" className={styles.nodeSub}>Today {dailyKwh.toFixed(1)} kWh</text>
+        <text x={cx} y={cy + r + 46} textAnchor="middle" className={styles.nodeSub}>Today {dailyKwh.toFixed(1)} kWh</text>
       )}
     </g>
   );
@@ -189,12 +189,12 @@ function BatteryNode({ cx, cy, r, powerW, soc, capacityWh, label = "Battery" }: 
       {isCharging && (
         <text x={cx} y={cy + 5} textAnchor="middle" dominantBaseline="middle" fontSize={13} fill="white" fontWeight="bold">⚡</text>
       )}
-      <text x={cx} y={cy - r - 15} textAnchor="middle" className={styles.nodeLabel}>{label}</text>
-      <text x={cx} y={cy + r + 19} textAnchor="middle" className={styles.nodeValue} style={{ fill: fillColor }}>{soc}% SOC</text>
-      <text x={cx} y={cy + r + 37} textAnchor="middle" className={styles.nodeSub}>
-        {isCharging ? `↑ Charging ${fmtW(powerW)}` : isDischarging ? `↓ Using ${fmtW(-powerW)}` : "Idle"}
+      <text x={cx} y={cy - r - 12} textAnchor="middle" className={styles.nodeLabel}>{label}</text>
+      <text x={cx} y={cy + r + 16} textAnchor="middle" className={styles.nodeValue} style={{ fill: fillColor }}>{soc}% SOC</text>
+      <text x={cx} y={cy + r + 32} textAnchor="middle" className={styles.nodeSub}>
+        {isCharging ? `↑ Charging ${fmtW(powerW)}` : isDischarging ? `↓ ${fmtW(-powerW)}` : "Idle"}
       </text>
-      <text x={cx} y={cy + r + 53} textAnchor="middle" className={styles.nodeSub}>{(capacityWh / 1000).toFixed(1)} kWh cap</text>
+      <text x={cx} y={cy + r + 46} textAnchor="middle" className={styles.nodeSub}>{(capacityWh / 1000).toFixed(1)} kWh cap</text>
     </g>
   );
 }
@@ -230,12 +230,12 @@ function GridNode({ cx, cy, r, powerW, dailyExportKwh, dailyImportKwh, label = "
         <path d="M -17,-12 Q -21,-4 -17,4" strokeWidth={1.5} />
         <path d="M 17,-12 Q 21,-4 17,4" strokeWidth={1.5} />
       </g>
-      <text x={cx} y={cy - r - 15} textAnchor="middle" className={styles.nodeLabel}>{label}</text>
-      <text x={cx} y={cy + r + 19} textAnchor="middle" className={styles.nodeValue} style={{ fill: color }}>
+      <text x={cx} y={cy - r - 12} textAnchor="middle" className={styles.nodeLabel}>{label}</text>
+      <text x={cx} y={cy + r + 16} textAnchor="middle" className={styles.nodeValue} style={{ fill: color }}>
         {isExporting ? "Exporting" : isImporting ? "Importing" : "Standby"}
       </text>
-      <text x={cx} y={cy + r + 37} textAnchor="middle" className={styles.nodeSub}>{fmtW(Math.abs(powerW))}</text>
-      <text x={cx} y={cy + r + 53} textAnchor="middle" className={styles.nodeSub}>↑{dailyExportKwh.toFixed(1)} ↓{dailyImportKwh.toFixed(1)} kWh</text>
+      <text x={cx} y={cy + r + 32} textAnchor="middle" className={styles.nodeSub}>{fmtW(Math.abs(powerW))}</text>
+      <text x={cx} y={cy + r + 46} textAnchor="middle" className={styles.nodeSub}>↑{dailyExportKwh.toFixed(1)} ↓{dailyImportKwh.toFixed(1)} kWh</text>
     </g>
   );
 }
@@ -277,12 +277,12 @@ function HouseNode({ cx, cy, r, loadW, label, online, fromSolarW, fromBatteryW, 
         <rect x={-hs * 0.75} y={hs * 0.1} width={hs * 0.38} height={hs * 0.3} rx={1} fill="rgba(30,58,138,0.35)" />
         <rect x={hs * 0.37} y={hs * 0.1} width={hs * 0.38} height={hs * 0.3} rx={1} fill="rgba(30,58,138,0.35)" />
       </g>
-      <text x={cx} y={cy + r + 19} textAnchor="middle" className={styles.nodeLabel}>{label}</text>
-      <text x={cx} y={cy + r + 37} textAnchor="middle" className={styles.nodeValue}>{fmtW(loadW)}</text>
+      <text x={cx} y={cy - r - 18} textAnchor="middle" className={styles.nodeLabel}>{label}</text>
+      <text x={cx} y={cy - r - 4} textAnchor="middle" className={styles.nodeValue}>{fmtW(loadW)}</text>
       {online ? (
-        <text x={cx} y={cy + r + 53} textAnchor="middle" className={styles.nodeSub}>{primarySource}</text>
+        <text x={cx} y={cy + r + 18} textAnchor="middle" className={styles.nodeSub}>{primarySource}</text>
       ) : (
-        <text x={cx} y={cy + r + 53} textAnchor="middle" className={styles.nodeSub} style={{ fill: "#f87171" }}>Offline</text>
+        <text x={cx} y={cy + r + 18} textAnchor="middle" className={styles.nodeSub} style={{ fill: "#f87171" }}>Offline</text>
       )}
     </g>
   );
@@ -290,13 +290,16 @@ function HouseNode({ cx, cy, r, loadW, label, online, fromSolarW, fromBatteryW, 
 
 // ── Combined solar badge ──────────────────────────────────────────────────────
 
-function CombinedSolarBadge({ cx, cy, totalW }: { cx: number; cy: number; totalW: number }) {
+function CombinedSolarBadge({ cx, cy, totalW, totalUsageW }: { cx: number; cy: number; totalW: number; totalUsageW: number }) {
   return (
     <g>
-      <text x={cx} y={cy} textAnchor="middle" fontSize={24} fontWeight="800" fill="var(--text)" letterSpacing="0.04em">
-        {totalW > 15 ? fmtW(totalW) : "0 W"}
+      <text x={cx} y={cy - 6} textAnchor="middle" fontSize={22} fontWeight="800" fill="var(--text)" letterSpacing="0.04em">
+        {totalW > 15 ? fmtW(totalW) : "0 W"} Gen
       </text>
-      <text x={cx} y={cy + 22} textAnchor="middle" fontSize={13} fontWeight="600" fill="var(--text-soft)" letterSpacing="0.03em">
+      <text x={cx} y={cy + 16} textAnchor="middle" fontSize={18} fontWeight="700" fill="#60a5fa" letterSpacing="0.03em">
+        {fmtW(totalUsageW)} Usage
+      </text>
+      <text x={cx} y={cy + 34} textAnchor="middle" fontSize={12} fontWeight="600" fill="var(--text-soft)" letterSpacing="0.03em">
         TOTAL KW BOTH HOUSES
       </text>
     </g>
@@ -368,8 +371,11 @@ export function UnifiedEnergyFlow(props: UnifiedEnergyFlowProps) {
   const gSolar   = { cx: 670, cy: 90,  r: 48 };
   
   // Middle Row: Houses (slightly inward, under panels)
-  const nHouse   = { cx: 245, cy: 280, r: 48 };
-  const gHouse   = { cx: 625, cy: 280, r: 48 };
+  const nHouse   = { cx: 240, cy: 285, r: 48 };
+  const gHouse   = { cx: 630, cy: 285, r: 48 };
+
+  // Total combined usage
+  const totalUsageW = nelsonLoadW + grannyLoadW;
 
   // Bottom Row: Battery (left), Grid (CENTER), Export indicator (right)
   const battery  = { cx: 145, cy: 500, r: 48 };
@@ -464,6 +470,9 @@ export function UnifiedEnergyFlow(props: UnifiedEnergyFlowProps) {
 
           {/* 9. Grid → Export indicator (horizontal right) */}
           <path id="p-grid-export" d={`M ${grid.cx+grid.r} ${grid.cy} L ${gridExport.cx-45} ${gridExport.cy}`} />
+
+          {/* 10. Import indicator → Grid (horizontal left — for pulling from grid) */}
+          <path id="p-import-grid" d={`M ${gridExport.cx-45} ${gridExport.cy} L ${grid.cx+grid.r} ${grid.cy}`} />
         </defs>
 
         {/* ── Flow lines (below nodes) ── */}
@@ -484,13 +493,14 @@ export function UnifiedEnergyFlow(props: UnifiedEnergyFlowProps) {
           <FlowLine pathId="p-battery-grid" powerW={batteryDischargingW > 0 ? batteryDischargingW : 0} color="#4ade80" dotColor="#86efac" />
           <FlowLine pathId="p-grid-battery" powerW={gridToBattery} color="#60a5fa" dotColor="#93c5fd" />
 
-          {/* Grid → Export indicator */}
+          {/* Grid ↔ External: export (green, right) or import (red, left) */}
           <FlowLine pathId="p-grid-export" powerW={nelsonGridExportW + grannyGridExportW} color="#4ade80" dotColor="#86efac" />
+          <FlowLine pathId="p-import-grid" powerW={combinedGridW > 0 ? combinedGridW : 0} color="#f87171" dotColor="#fca5a5" />
         </g>
 
-        {/* ── "Usage in kW" labels on House→Grid connections ── */}
-        <text x={335} y={395} textAnchor="middle" className={styles.nodeSub} fontSize={11}>Usage in kW</text>
-        <text x={535} y={395} textAnchor="middle" className={styles.nodeSub} fontSize={11}>Usage in kW</text>
+        {/* ── "Usage in kW" labels next to House→Grid connections (offset to avoid overlap) ── */}
+        <text x={290} y={405} textAnchor="middle" className={styles.nodeSub} fontSize={10} fill="var(--text-soft)">↓ {fmtW(nelsonLoadW)}</text>
+        <text x={580} y={405} textAnchor="middle" className={styles.nodeSub} fontSize={10} fill="var(--text-soft)">↓ {fmtW(grannyLoadW)}</text>
 
         {/* ── Nodes (above flows) ── */}
         <g filter="url(#node-shadow)">
@@ -524,15 +534,35 @@ export function UnifiedEnergyFlow(props: UnifiedEnergyFlowProps) {
             <path d="M -18,-14 Q -22,-6 -18,2" strokeWidth={1.5} />
             <path d="M 18,-14 Q 22,-6 18,2" strokeWidth={1.5} />
           </g>
-          <text x={gridExport.cx} y={gridExport.cy + 40} textAnchor="middle" className={styles.nodeValue} style={{ fill: (nelsonGridExportW + grannyGridExportW) > 10 ? '#4ade80' : 'var(--text-soft)' }}>
-            {fmtW(nelsonGridExportW + grannyGridExportW)}
-          </text>
-          <text x={gridExport.cx} y={gridExport.cy + 57} textAnchor="middle" className={styles.nodeSub}>Being Sent</text>
-          <text x={gridExport.cx} y={gridExport.cy + 71} textAnchor="middle" className={styles.nodeSub}>to Grid</text>
+          {combinedGridW < -10 ? (
+            <>
+              <text x={gridExport.cx} y={gridExport.cy + 40} textAnchor="middle" className={styles.nodeValue} style={{ fill: '#4ade80' }}>
+                {fmtW(Math.abs(combinedGridW))}
+              </text>
+              <text x={gridExport.cx} y={gridExport.cy + 57} textAnchor="middle" className={styles.nodeSub}>Being Sent</text>
+              <text x={gridExport.cx} y={gridExport.cy + 71} textAnchor="middle" className={styles.nodeSub}>to Grid</text>
+            </>
+          ) : combinedGridW > 10 ? (
+            <>
+              <text x={gridExport.cx} y={gridExport.cy + 40} textAnchor="middle" className={styles.nodeValue} style={{ fill: '#f87171' }}>
+                {fmtW(combinedGridW)}
+              </text>
+              <text x={gridExport.cx} y={gridExport.cy + 57} textAnchor="middle" className={styles.nodeSub}>Pulled from</text>
+              <text x={gridExport.cx} y={gridExport.cy + 71} textAnchor="middle" className={styles.nodeSub}>Grid</text>
+            </>
+          ) : (
+            <>
+              <text x={gridExport.cx} y={gridExport.cy + 40} textAnchor="middle" className={styles.nodeValue} style={{ fill: 'var(--text-soft)' }}>
+                0 W
+              </text>
+              <text x={gridExport.cx} y={gridExport.cy + 57} textAnchor="middle" className={styles.nodeSub}>Grid</text>
+              <text x={gridExport.cx} y={gridExport.cy + 71} textAnchor="middle" className={styles.nodeSub}>Standby</text>
+            </>
+          )}
         </g>
 
         {/* ── Combined Title (center top) ── */}
-        <CombinedSolarBadge cx={435} cy={70} totalW={totalSolarW} />
+        <CombinedSolarBadge cx={435} cy={65} totalW={totalSolarW} totalUsageW={totalUsageW} />
 
         {/* Max charge indicator */}
         {batteryChargingW > 4500 && (
