@@ -47,7 +47,8 @@ if [ "${TAILSCALE_ENABLED:-1}" != "0" ]; then
     echo "tailscale up failed; continuing without Tailscale (local device data will be unavailable)" >&2
     TAILSCALE_ENABLED=0
   fi
-  
+
+  if [ "${TAILSCALE_ENABLED}" != "0" ]; then
   echo "Tailscale is up. Waiting for connection to establish..."
   
   # Wait for Tailscale to fully connect (up to 30 seconds)
@@ -176,7 +177,8 @@ if [ "${TAILSCALE_ENABLED:-1}" != "0" ]; then
   ) &
   
   echo "Starting application (connectivity tests running in background)..."
-fi
+  fi # end if TAILSCALE_ENABLED != 0 (post-up)
+fi   # end if TAILSCALE_ENABLED (outer)
 
 HOST="${HOST:-0.0.0.0}"
 PORT="${PORT:-3000}"
