@@ -62,8 +62,8 @@ export function SimplifiedDashboard({
 
   // Hinen convention (confirmed in lib/hinen.ts deriveNelsonsFlows):
   // gridW > 0 = importing from grid, gridW < 0 = exporting to grid
-  const isExporting = gridW < -10;
-  const isImporting = gridW > 10;
+  const isExporting = gridW < -250;
+  const isImporting = gridW > 250;
   const gridLabel = isExporting ? "Exporting" : isImporting ? "Importing" : "Idle";
   const gridColor = isExporting ? "#22c55e" : isImporting ? "#ef4444" : "#64748b";
 
