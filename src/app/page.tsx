@@ -32,7 +32,7 @@ import {
 } from "recharts";
 import { usePowerData } from "@/hooks/usePowerData";
 import { useHistoricalMetrics, RANGE_OPTIONS, type RangeKey } from "@/hooks/useHistoricalMetrics";
-import { UnifiedEnergyFlow } from "@/components/EnergyFlow";
+import { SimplifiedDashboard } from "@/components/SimplifiedDashboard";
 import { useHinenData } from "@/hooks/useHinenData";
 import { AlertSettings } from "@/components/AlertSettings";
 import { useTheme } from "@/hooks/useTheme";
@@ -223,60 +223,34 @@ export default function Home() {
         <ErrorState message="No devices configured yet." onRetry={() => mutate()} />
       ) : (
         <>
-          {/* Unified Energy Flow Diagram */}
+          {/* Simplified Dashboard */}
           {(data?.combined || data?.devices) && (() => {
             const nelson = data?.devices?.find((d) => d.id === "nelsons-house");
             const granny = data?.devices?.find((d) => d.id === "granny-flat");
             const rawProps = hinenData?.raw_properties;
 
-            // Prefer Hinen live values for solar & battery (Watts); fall back to Fronius kW × 1000
-            // NOTE: Hinen TotalLoadPower & GridTotalPower are WHOLE-PROPERTY values
-            // (the CT clamp is on the mains meter), NOT just Nelson's house.
-            // Use Fronius per-house consumption for individual house loads.
             const nelsonSolarW = rawProps?.GenerationPower ?? (nelson?.generation ?? 0) * 1000;
-            const nelsonLoadW  = (nelson?.consumption ?? 0) * 1000;  // Fronius per-house
-            const batteryW     = rawProps?.BatteryPower    ?? 0;
-            const batterySoc   = hinenData?.battery.soc    ?? 0;
+            const nelsonLoadW  = (nelson?.consumption ?? 0) * 1000;
+            const batterySoc   = hinenData?.battery.soc ?? 0;
 
-            // Hinen GridTotalPower = total property grid (includes Granny).
-            // Nelson's actual grid = total property grid minus Granny's grid share.
             const totalPropertyGridW = rawProps?.GridTotalPower ?? (nelson?.grid ?? 0) * 1000;
             const grannyGridVal      = (granny?.grid ?? 0) * 1000;
-            const nelsonGridW  = totalPropertyGridW - grannyGridVal;
+            // combined grid W: negative = export, positive = import
+            const combinedGridW = totalPropertyGridW;
 
             return (
               <section className={styles.energyFlowSection}>
-                <UnifiedEnergyFlow
+                <SimplifiedDashboard
                   nelsonSolarW={nelsonSolarW}
-                  nelsonLoadW={nelsonLoadW}
-                  batteryW={batteryW}
-                  batterySoc={batterySoc}
-                  nelsonGridW={nelsonGridW}
-                  nelsonDailySolarKwh={hinenData?.solar.daily_kwh ?? nelson?.generation ?? 0}
-                  nelsonDailyImportKwh={hinenData?.grid.daily_import_kwh ?? 0}
-                  nelsonDailyExportKwh={hinenData?.grid.daily_export_kwh ?? 0}
-                  batteryCapacityWh={rawProps?.BatCapacity ?? 30720}
                   grannySolarW={(granny?.generation ?? 0) * 1000}
+                  nelsonLoadW={nelsonLoadW}
                   grannyLoadW={(granny?.consumption ?? 0) * 1000}
-                  grannyGridW={grannyGridVal}
-                  grannyDailySolarKwh={0} /* Fronius live API doesn't expose daily totals */
-                  grannyDailyImportKwh={0} /* daily totals not in Fronius live API */
-                  grannyDailyExportKwh={0} /* daily totals not in Fronius live API */
-                  nelsonOnline={nelson?.status === "ok"}
-                  grannyOnline={granny?.status === "ok"}
-                  dailyRevenue={hinenData?.revenue.daily_total}
-                  monthlyRevenue={hinenData?.revenue.monthly_total}
+                  batterySoc={batterySoc}
+                  gridW={combinedGridW}
                 />
               </section>
             );
           })()}
-
-          {/* Data Cards at the bottom */}
-          <section className={styles.grid}>
-            {cards.map((snapshot, index) => (
-              <PowerCard key={snapshot.id} snapshot={snapshot} index={index} />
-            ))}
-          </section>
 
           <HistoricalSection
             data={historical}

@@ -1,0 +1,224 @@
+/* ─────────────────────────────────────────────────────────────
+   Simplified Dashboard — portrait-first, fits one phone screen
+   ───────────────────────────────────────────────────────────── */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 1rem 0.75rem 1.5rem;
+  gap: 0.5rem;
+  font-family: inherit;
+}
+
+/* ── Title ─────────────────────────────────────────────────── */
+.title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text, #1e293b);
+  text-align: center;
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.01em;
+}
+
+/* ── Section label ─────────────────────────────────────────── */
+.sectionLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-soft, #64748b);
+  align-self: flex-start;
+  margin-bottom: 0.1rem;
+}
+
+/* ── Row of two circles + center text ──────────────────────── */
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+.circle {
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 10px;
+  flex-shrink: 0;
+}
+
+.solarCircle {
+  background: #fef3c7;
+  border: 3px solid #f59e0b;
+  color: #92400e;
+}
+
+.usageCircle {
+  background: #fee2e2;
+  border: 3px solid #ef4444;
+  color: #7f1d1d;
+}
+
+.circleLabel {
+  font-size: 0.65rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.circleValue {
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.centerMid {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.centerLabel {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--text-soft, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 2px;
+}
+
+.centerValue {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text, #1e293b);
+}
+
+/* ── Vertical connector arrow ──────────────────────────────── */
+.connector {
+  font-size: 1.5rem;
+  color: var(--text-soft, #94a3b8);
+  line-height: 1;
+  margin: 0.15rem 0;
+}
+
+/* ── Middle row: Battery ←→ System ←→ Grid ─────────────────── */
+.middleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 0.25rem;
+}
+
+.midCard {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0.6rem 0.4rem;
+  border-radius: 12px;
+  border: 2.5px solid #334155;
+  background: var(--card-bg, #fff);
+  min-width: 0;
+}
+
+.systemCard {
+  background: #1e40af;
+  border-color: #1e40af;
+  color: white;
+}
+
+.midCardIcon {
+  font-size: 1.2rem;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.midCardTitle {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-soft, #64748b);
+  margin-bottom: 2px;
+}
+
+.systemCard .midCardTitle {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.midCardBig {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text, #1e293b);
+  line-height: 1.1;
+}
+
+.systemCard .midCardBig {
+  color: white;
+}
+
+.midCardSub {
+  font-size: 0.58rem;
+  color: var(--text-soft, #64748b);
+  margin-top: 2px;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.midConnector {
+  font-size: 1rem;
+  color: var(--text-soft, #94a3b8);
+  flex-shrink: 0;
+  padding: 0 0.1rem;
+}
+
+/* ── Dark mode ─────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  .solarCircle {
+    background: rgba(251, 191, 36, 0.12);
+    color: #fde68a;
+  }
+  .usageCircle {
+    background: rgba(239, 68, 68, 0.12);
+    color: #fca5a5;
+  }
+  .midCard {
+    background: var(--card-bg, #1e293b);
+    border-color: #334155;
+  }
+  .midCardBig {
+    color: var(--text, #f1f5f9);
+  }
+  .centerValue {
+    color: var(--text, #f1f5f9);
+  }
+}
+
+/* ── Phone-size tweaks ─────────────────────────────────────── */
+@media (max-width: 380px) {
+  .circle {
+    width: 90px;
+    height: 90px;
+  }
+  .circleValue {
+    font-size: 0.9rem;
+  }
+  .midCardBig {
+    font-size: 0.95rem;
+  }
+}
+
