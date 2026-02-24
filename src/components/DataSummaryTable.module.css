@@ -1,0 +1,187 @@
+/* ─────────────────────────────────────────────────
+   DataSummaryTable — live data table for inverters & battery
+   ───────────────────────────────────────────────── */
+
+.wrapper {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0 0.5rem;
+}
+
+.tableCard {
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.tableTitle {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-soft, #64748b);
+  padding: 0.6rem 1rem 0.4rem;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.table thead tr {
+  background: transparent;
+}
+
+.table th {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-soft, #94a3b8);
+  padding: 0.5rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.table td {
+  padding: 0.65rem 1rem;
+  color: var(--text, #0f172a);
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  vertical-align: middle;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table tbody tr:hover {
+  background: var(--card-hover, #f8fafc);
+}
+
+/* ── Cell variants ─────────────────────────────── */
+.deviceName {
+  font-weight: 600;
+  color: var(--text, #0f172a);
+  white-space: nowrap;
+}
+
+.solar {
+  font-weight: 700;
+  color: #d97706;
+}
+
+.usage {
+  font-weight: 700;
+  color: var(--danger, #ef4444);
+}
+
+.soc {
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--text, #0f172a);
+}
+
+.refresh {
+  font-size: 0.75rem;
+  color: var(--text-soft, #94a3b8);
+}
+
+/* ── Status badges ─────────────────────────────── */
+.statusOnline,
+.statusOffline,
+.statusCharging,
+.statusDischarging,
+.statusIdle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 2px 8px 2px 6px;
+  border-radius: 999px;
+}
+
+.statusOnline {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+
+.statusOffline {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+.statusCharging {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+
+.statusDischarging {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+.statusIdle {
+  background: rgba(100, 116, 139, 0.12);
+  color: #64748b;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+/* ── Dark mode adjustments ─────────────────────── */
+:root[data-theme="dark"] .tableCard {
+  background: var(--card-bg, rgba(255, 255, 255, 0.05));
+  border-color: var(--border-color, rgba(255, 255, 255, 0.1));
+}
+
+:root[data-theme="dark"] .table td,
+:root[data-theme="dark"] .deviceName {
+  color: var(--text, #f8fafc);
+}
+
+:root[data-theme="dark"] .statusOnline,
+:root[data-theme="dark"] .statusCharging {
+  background: rgba(90, 241, 140, 0.15);
+  color: #5af18c;
+}
+
+:root[data-theme="dark"] .statusDischarging {
+  background: rgba(255, 107, 107, 0.15);
+  color: #ff6b6b;
+}
+
+:root[data-theme="dark"] .statusOffline {
+  background: rgba(255, 107, 107, 0.15);
+  color: #ff6b6b;
+}
+
+/* ── Mobile ────────────────────────────────────── */
+@media (max-width: 480px) {
+  .table {
+    font-size: 0.78rem;
+  }
+  .table th,
+  .table td {
+    padding: 0.5rem 0.6rem;
+  }
+  .deviceName {
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

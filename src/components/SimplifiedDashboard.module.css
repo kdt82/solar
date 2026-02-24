@@ -58,15 +58,15 @@
 }
 
 .solarCircle {
-  background: #fef3c7;
-  border: 3px solid #f59e0b;
-  color: #92400e;
+  background: #f59e0b;
+  border: 3px solid #d97706;
+  color: #fff;
 }
 
 .usageCircle {
-  background: #fee2e2;
-  border: 3px solid #ef4444;
-  color: #7f1d1d;
+  background: #ef4444;
+  border: 3px solid #dc2626;
+  color: #fff;
 }
 
 .circleLabel {
@@ -236,25 +236,15 @@
 }
 
 /* ── Dark mode ─────────────────────────────────────────────── */
-@media (prefers-color-scheme: dark) {
-  .solarCircle {
-    background: rgba(251, 191, 36, 0.12);
-    color: #fde68a;
-  }
-  .usageCircle {
-    background: rgba(239, 68, 68, 0.12);
-    color: #fca5a5;
-  }
-  .midCard {
-    background: var(--card-bg, #1e293b);
-    border-color: #334155;
-  }
-  .midCardBig {
-    color: var(--text, #f1f5f9);
-  }
-  .centerValue {
-    color: var(--text, #f1f5f9);
-  }
+:root[data-theme="dark"] .midCard {
+  background: var(--card-bg, rgba(255,255,255,0.05));
+  border-color: #334155;
+}
+:root[data-theme="dark"] .midCardBig {
+  color: var(--text, #f1f5f9);
+}
+:root[data-theme="dark"] .centerValue {
+  color: var(--text, #f1f5f9);
 }
 
 /* ── Phone-size tweaks ─────────────────────────────────────── */

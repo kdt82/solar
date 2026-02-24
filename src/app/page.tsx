@@ -33,6 +33,7 @@ import {
 import { usePowerData } from "@/hooks/usePowerData";
 import { useHistoricalMetrics, RANGE_OPTIONS, type RangeKey } from "@/hooks/useHistoricalMetrics";
 import { SimplifiedDashboard } from "@/components/SimplifiedDashboard";
+import { DataSummaryTable } from "@/components/DataSummaryTable";
 import { useHinenData } from "@/hooks/useHinenData";
 import { AlertSettings } from "@/components/AlertSettings";
 import { useTheme } from "@/hooks/useTheme";
@@ -64,6 +65,7 @@ const cardVariants: Variants = {
 export default function Home() {
   const { theme, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState<"dashboard" | "settings">("dashboard");
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [range, setRange] = useState<RangeKey>("24h");
   const [customRange, setCustomRange] = useState<{ from?: string; to?: string }>({});
   const { data, error, isLoading, mutate, isValidating } = usePowerData();
@@ -233,39 +235,65 @@ export default function Home() {
             const nelsonLoadW  = (nelson?.consumption ?? 0) * 1000;
             const batteryW     = rawProps?.BatteryPower ?? 0; // +ve = charging, -ve = discharging
             const batterySoc   = hinenData?.battery.soc ?? 0;
+            const displayedSoc = Math.max(0, Math.round(((batterySoc - 12) / 88) * 100));
 
             const totalPropertyGridW = rawProps?.GridTotalPower ?? (nelson?.grid ?? 0) * 1000;
             // Raw device: negative = importing from grid, positive = exporting to grid
             const combinedGridW = totalPropertyGridW;
 
             return (
-              <section className={styles.energyFlowSection}>
-                <SimplifiedDashboard
-                  nelsonSolarW={nelsonSolarW}
-                  grannySolarW={(granny?.generation ?? 0) * 1000}
-                  nelsonLoadW={nelsonLoadW}
-                  grannyLoadW={(granny?.consumption ?? 0) * 1000}
-                  batteryW={batteryW}
-                  batterySoc={batterySoc}
-                  gridW={combinedGridW}
+              <>
+                <section className={styles.energyFlowSection}>
+                  <SimplifiedDashboard
+                    nelsonSolarW={nelsonSolarW}
+                    grannySolarW={(granny?.generation ?? 0) * 1000}
+                    nelsonLoadW={nelsonLoadW}
+                    grannyLoadW={(granny?.consumption ?? 0) * 1000}
+                    batteryW={batteryW}
+                    batterySoc={batterySoc}
+                    gridW={combinedGridW}
+                  />
+                </section>
+
+                {/* Live Data Table */}
+                <DataSummaryTable
+                  nelson={nelson}
+                  granny={granny}
+                  hinenData={hinenData}
+                  batterySocDisplayed={displayedSoc}
                 />
-              </section>
+              </>
             );
           })()}
 
-          <HistoricalSection
-            data={historical}
-            range={range}
-            customFrom={customRange.from}
-            customTo={customRange.to}
-            onCustomRangeChange={handleCustomRangeChange}
-            onClearCustom={handleClearCustom}
-            onRangeChange={handleRangeChange}
-            isLoading={historicalLoading && !historical}
-            isValidating={historicalValidating}
-            error={historicalError}
-            onRefresh={() => refreshHistorical()}
-          />
+          {/* Performance History Accordion */}
+          <div className={styles.accordionWrapper}>
+            <button
+              className={styles.accordionToggle}
+              onClick={() => setHistoryOpen((v) => !v)}
+              aria-expanded={historyOpen}
+            >
+              <span>📊 Performance History</span>
+              <span className={historyOpen ? styles.chevronUp : styles.chevronDown}>▾</span>
+            </button>
+            {historyOpen && (
+              <div className={styles.accordionBody}>
+                <HistoricalSection
+                  data={historical}
+                  range={range}
+                  customFrom={customRange.from}
+                  customTo={customRange.to}
+                  onCustomRangeChange={handleCustomRangeChange}
+                  onClearCustom={handleClearCustom}
+                  onRangeChange={handleRangeChange}
+                  isLoading={historicalLoading && !historical}
+                  isValidating={historicalValidating}
+                  error={historicalError}
+                  onRefresh={() => refreshHistorical()}
+                />
+              </div>
+            )}
+          </div>
         </>
       )}
     </main>

@@ -1105,3 +1105,51 @@
     gap: 1rem;
   }
 }
+
+/* ── Performance History Accordion ───────────────────────── */
+.accordionWrapper {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--card-bg, #fff);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.accordionToggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.25rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text, #0f172a);
+  transition: background 0.15s;
+  text-align: left;
+}
+
+.accordionToggle:hover {
+  background: var(--card-hover, #f8fafc);
+}
+
+.chevronDown,
+.chevronUp {
+  font-size: 1.1rem;
+  transition: transform 0.2s;
+  color: var(--text-soft, #64748b);
+}
+
+.chevronUp {
+  transform: rotate(180deg);
+}
+
+.accordionBody {
+  border-top: 1px solid var(--border-color, #e5e7eb);
+  padding: 1rem 0.25rem 0.5rem;
+}
