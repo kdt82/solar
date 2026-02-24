@@ -57,7 +57,7 @@ export function DataSummaryTable({ nelson, granny, hinenData, batterySocDisplaye
                       {online ? "Online" : "Offline"}
                     </span>
                   </td>
-                  <td className={styles.refresh}>5 sec</td>
+                  <td className={styles.refresh}>5 sec (LAN)</td>
                 </tr>
               );
             })}
@@ -89,7 +89,7 @@ export function DataSummaryTable({ nelson, granny, hinenData, batterySocDisplaye
                   {battStatus}
                 </span>
               </td>
-              <td className={styles.refresh}>5 sec</td>
+              <td className={styles.refresh}>30 sec (cloud)</td>
             </tr>
           </tbody>
         </table>

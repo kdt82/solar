@@ -11,10 +11,10 @@ const fetcher = async (url: string): Promise<HinenStatus> => {
 
 export function useHinenData() {
   return useSWR<HinenStatus>("/api/hinen", fetcher, {
-    refreshInterval: 5000,
+    refreshInterval: 30000, // proxy caches for 30s — no benefit polling faster
     revalidateOnFocus: false,
     shouldRetryOnError: true,
     errorRetryInterval: 10000,
-    dedupingInterval: 2500,
+    dedupingInterval: 25000,
   });
 }
