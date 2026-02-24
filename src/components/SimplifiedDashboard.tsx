@@ -60,9 +60,10 @@ export function SimplifiedDashboard({
   // Battery SOC: 12% actual = 0% displayed, 100% = 100%
   const displayedSoc = Math.max(0, Math.round(((batterySoc - 12) / 88) * 100));
 
-  // Raw device sign: negative = importing from grid, positive = exporting to grid
-  const isExporting = gridW > 10;
-  const isImporting = gridW < -10;
+  // Hinen convention (confirmed in lib/hinen.ts deriveNelsonsFlows):
+  // gridW > 0 = importing from grid, gridW < 0 = exporting to grid
+  const isExporting = gridW < -10;
+  const isImporting = gridW > 10;
   const gridLabel = isExporting ? "Exporting" : isImporting ? "Importing" : "Idle";
   const gridColor = isExporting ? "#22c55e" : isImporting ? "#ef4444" : "#64748b";
 

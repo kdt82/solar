@@ -238,7 +238,7 @@ export default function Home() {
             const displayedSoc = Math.max(0, Math.round(((batterySoc - 12) / 88) * 100));
 
             const totalPropertyGridW = rawProps?.GridTotalPower ?? (nelson?.grid ?? 0) * 1000;
-            // Raw device: negative = importing from grid, positive = exporting to grid
+            // Hinen convention: gridW > 0 = importing, gridW < 0 = exporting
             const combinedGridW = totalPropertyGridW;
 
             return (
