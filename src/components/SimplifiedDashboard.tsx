@@ -8,8 +8,9 @@ interface SimplifiedDashboardProps {
   grannySolarW: number;
   nelsonLoadW: number;
   grannyLoadW: number;
+  batteryW: number;    // +ve = charging, -ve = discharging
   batterySoc: number;
-  gridW: number; // -ve export, +ve import
+  gridW: number;       // raw device: -ve = importing, +ve = exporting
 }
 
 function fmtKW(w: number): string {
@@ -21,27 +22,61 @@ function fmtWKW(w: number): string {
   return `${abs} W / ${(abs / 1000).toFixed(2)} kW`;
 }
 
+// ── Animated horizontal flow connector ────────────────────────────────────────
+// direction: "left" = dots move left (←), "right" = dots move right (→), "idle" = static
+function FlowConnector({ direction, color }: { direction: "left" | "right" | "idle"; color: string }) {
+  const dotClass = direction === "right" ? styles.flowDotRight : styles.flowDotLeft;
+  return (
+    <div className={styles.flowConnector}>
+      <div className={styles.flowTrack}>
+        {direction !== "idle" && (
+          <>
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className={`${styles.flowDot} ${dotClass}`}
+                style={{ background: color, animationDelay: `${i * 0.4}s` }}
+              />
+            ))}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function SimplifiedDashboard({
   nelsonSolarW,
   grannySolarW,
   nelsonLoadW,
   grannyLoadW,
+  batteryW,
   batterySoc,
   gridW,
 }: SimplifiedDashboardProps) {
   const combinedSolarW = nelsonSolarW + grannySolarW;
   const combinedLoadW = nelsonLoadW + grannyLoadW;
 
-  // Battery SOC adjustment:
-  // 12% actual = 0% displayed, 100% actual = 100% displayed
+  // Battery SOC: 12% actual = 0% displayed, 100% = 100%
   const displayedSoc = Math.max(0, Math.round(((batterySoc - 12) / 88) * 100));
 
-  const isExporting = gridW < -10;
-  const isImporting = gridW > 10;
+  // Raw device sign: negative = importing from grid, positive = exporting to grid
+  const isExporting = gridW > 10;
+  const isImporting = gridW < -10;
   const gridLabel = isExporting ? "Exporting" : isImporting ? "Importing" : "Idle";
   const gridColor = isExporting ? "#22c55e" : isImporting ? "#ef4444" : "#64748b";
+
   const batteryColor =
     displayedSoc > 60 ? "#22c55e" : displayedSoc > 25 ? "#f59e0b" : "#ef4444";
+
+  // Battery connector: charging = System→Battery = dots flow left (battery is on left)
+  const battCharging = batteryW > 10;
+  const battDischarging = batteryW < -10;
+  const battDirection: "left" | "right" | "idle" = battCharging ? "left" : battDischarging ? "right" : "idle";
+
+  // Grid connector: exporting = System→Grid = dots flow right (grid is on right)
+  //                 importing = Grid→System = dots flow left
+  const gridDirection: "left" | "right" | "idle" = isExporting ? "right" : isImporting ? "left" : "idle";
 
   return (
     <div className={styles.container}>
@@ -78,11 +113,11 @@ export function SimplifiedDashboard({
             {displayedSoc}%
           </div>
           <div className={styles.midCardSub}>
-            {displayedSoc === 0 ? "Reserve" : displayedSoc > 60 ? "Good" : displayedSoc > 25 ? "Low" : "Very Low"}
+            {battCharging ? `↑ Charging` : battDischarging ? `↓ Discharging` : "Idle"}
           </div>
         </div>
 
-        <div className={styles.midConnector}>←→</div>
+        <FlowConnector direction={battDirection} color={batteryColor} />
 
         <div className={`${styles.midCard} ${styles.systemCard}`}>
           <div className={styles.midCardIcon}>⚡</div>
@@ -90,7 +125,7 @@ export function SimplifiedDashboard({
           <div className={styles.midCardBig}>System</div>
         </div>
 
-        <div className={styles.midConnector}>←→</div>
+        <FlowConnector direction={gridDirection} color={gridColor} />
 
         <div className={styles.midCard} style={{ borderColor: gridColor }}>
           <div className={styles.midCardIcon}>🏭</div>

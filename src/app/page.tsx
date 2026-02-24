@@ -231,11 +231,11 @@ export default function Home() {
 
             const nelsonSolarW = rawProps?.GenerationPower ?? (nelson?.generation ?? 0) * 1000;
             const nelsonLoadW  = (nelson?.consumption ?? 0) * 1000;
+            const batteryW     = rawProps?.BatteryPower ?? 0; // +ve = charging, -ve = discharging
             const batterySoc   = hinenData?.battery.soc ?? 0;
 
             const totalPropertyGridW = rawProps?.GridTotalPower ?? (nelson?.grid ?? 0) * 1000;
-            const grannyGridVal      = (granny?.grid ?? 0) * 1000;
-            // combined grid W: negative = export, positive = import
+            // Raw device: negative = importing from grid, positive = exporting to grid
             const combinedGridW = totalPropertyGridW;
 
             return (
@@ -245,6 +245,7 @@ export default function Home() {
                   grannySolarW={(granny?.generation ?? 0) * 1000}
                   nelsonLoadW={nelsonLoadW}
                   grannyLoadW={(granny?.consumption ?? 0) * 1000}
+                  batteryW={batteryW}
                   batterySoc={batterySoc}
                   gridW={combinedGridW}
                 />
