@@ -102,14 +102,15 @@ export function SimplifiedDashboard({
   }
 
   function getUsageStyle(w: number): React.CSSProperties {
-    if (w < 1500) return {
+    const absW = Math.abs(w);
+    if (absW < 1500) return {
       background: "linear-gradient(145deg, #4ade80, #22c55e)",
       border: "3px solid #16a34a",
       boxShadow: "inset 0 4px 6px rgba(255, 255, 255, 0.3), 0 6px 12px rgba(34, 197, 94, 0.3)",
       color: "#fff",
       textShadow: "0 1px 2px rgba(0, 0, 0, 0.15)"
     }; // Green
-    if (w <= 2500) return {
+    if (absW <= 2500) return {
       background: "linear-gradient(145deg, #fbbf24, #f59e0b)",
       border: "3px solid #d97706",
       boxShadow: "inset 0 4px 6px rgba(255, 255, 255, 0.3), 0 6px 12px rgba(245, 158, 11, 0.3)",
@@ -203,7 +204,12 @@ export function SimplifiedDashboard({
           <div className={styles.midCardIcon}>🏭</div>
           <div className={styles.midCardTitle}>Grid</div>
           <div className={styles.midCardBig} style={{ color: gridColor }}>{gridLabel}</div>
-          <div className={styles.midCardSub}>{fmtWKW(gridW)}</div>
+          <div style={{ fontSize: '0.9rem', fontWeight: 800, color: gridColor }}>
+            {(Math.abs(gridW) / 1000).toFixed(2)} kW
+          </div>
+          <div className={styles.midCardSub}>
+            {Math.abs(Math.round(gridW))} W
+          </div>
         </div>
       </div>
 
