@@ -57,23 +57,45 @@ export function SimplifiedDashboard({
   const combinedSolarW = nelsonSolarW + grannySolarW;
   const combinedLoadW = nelsonLoadW + grannyLoadW;
 
-  const [nelsonZeroTime, setNelsonZeroTime] = useState<number | null>(null);
-  const [grannyZeroTime, setGrannyZeroTime] = useState<number | null>(null);
-  const [now, setNow] = useState<number>(Date.now());
+  const [nelsonZeroTime, setNelsonZeroTime] = useState<number | null>(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("nelsonZeroTime");
+      if (stored) return parseInt(stored, 10);
+    }
+    return null;
+  });
+  const [grannyZeroTime, setGrannyZeroTime] = useState<number | null>(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("grannyZeroTime");
+      if (stored) return parseInt(stored, 10);
+    }
+    return null;
+  });
+  const [now, setNow] = useState<number>(() => Date.now());
 
   useEffect(() => {
     if (nelsonSolarW > 0) {
-      setNelsonZeroTime(null);
+      if (nelsonZeroTime !== null) {
+        setNelsonZeroTime(null);
+        localStorage.removeItem("nelsonZeroTime");
+      }
     } else if (nelsonZeroTime === null) {
-      setNelsonZeroTime(Date.now());
+      const currentNow = Date.now();
+      setNelsonZeroTime(currentNow);
+      localStorage.setItem("nelsonZeroTime", currentNow.toString());
     }
   }, [nelsonSolarW, nelsonZeroTime]);
 
   useEffect(() => {
     if (grannySolarW > 0) {
-      setGrannyZeroTime(null);
+      if (grannyZeroTime !== null) {
+        setGrannyZeroTime(null);
+        localStorage.removeItem("grannyZeroTime");
+      }
     } else if (grannyZeroTime === null) {
-      setGrannyZeroTime(Date.now());
+      const currentNow = Date.now();
+      setGrannyZeroTime(currentNow);
+      localStorage.setItem("grannyZeroTime", currentNow.toString());
     }
   }, [grannySolarW, grannyZeroTime]);
 
