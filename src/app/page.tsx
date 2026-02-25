@@ -38,6 +38,7 @@ import { useHinenData } from "@/hooks/useHinenData";
 import { AlertSettings } from "@/components/AlertSettings";
 import { useTheme } from "@/hooks/useTheme";
 import { useAlertSettings } from "@/hooks/useAlertSettings";
+import { useWeather, getWeatherIcon } from "@/hooks/useWeather";
 import type { DeviceSnapshot, HistoricalSummary } from "@/types/power";
 import styles from "./page.module.css";
 
@@ -70,6 +71,7 @@ export default function Home() {
   const [customRange, setCustomRange] = useState<{ from?: string; to?: string }>({});
   const { data, error, isLoading, mutate, isValidating } = usePowerData();
   const { data: hinenData } = useHinenData();
+  const { weather } = useWeather();
   const {
     settings: alertSettings,
     save: saveAlertSettings,
@@ -185,7 +187,14 @@ export default function Home() {
                 </motion.span>
                 Refresh now
               </button>
-              <span className={styles.subtitle}>Updated {updatedLabel}</span>
+              <span className={styles.subtitle}>
+                <span>Updated {updatedLabel}</span>
+                {weather && (
+                  <span className={styles.weatherBadge}>
+                    {getWeatherIcon(weather.weatherCode)} {Math.round(weather.temperature)}°C
+                  </span>
+                )}
+              </span>
             </>
           )}
         </div>

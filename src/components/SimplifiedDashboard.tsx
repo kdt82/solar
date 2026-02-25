@@ -57,6 +57,23 @@ export function SimplifiedDashboard({
   const combinedSolarW = nelsonSolarW + grannySolarW;
   const combinedLoadW = nelsonLoadW + grannyLoadW;
 
+  const THRESHOLD_MS = 30 * 1000;
+
+  const [nelsonIsGrey, setNelsonIsGrey] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("nelsonIsGrey");
+      if (stored !== null) return stored === "true";
+    }
+    return nelsonSolarW <= 0;
+  });
+  const [grannyIsGrey, setGrannyIsGrey] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("grannyIsGrey");
+      if (stored !== null) return stored === "true";
+    }
+    return grannySolarW <= 0;
+  });
+
   const [nelsonZeroTime, setNelsonZeroTime] = useState<number | null>(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("nelsonZeroTime");
@@ -71,41 +88,97 @@ export function SimplifiedDashboard({
     }
     return null;
   });
+  const [nelsonPositiveTime, setNelsonPositiveTime] = useState<number | null>(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("nelsonPositiveTime");
+      if (stored) return parseInt(stored, 10);
+    }
+    return null;
+  });
+  const [grannyPositiveTime, setGrannyPositiveTime] = useState<number | null>(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("grannyPositiveTime");
+      if (stored) return parseInt(stored, 10);
+    }
+    return null;
+  });
+
   const [now, setNow] = useState<number>(() => Date.now());
 
+  useEffect(() => {
+    const int = setInterval(() => setNow(Date.now()), 5000);
+    return () => clearInterval(int);
+  }, []);
+
+  // Nelson: track when solar goes to zero or becomes positive
   useEffect(() => {
     if (nelsonSolarW > 0) {
       if (nelsonZeroTime !== null) {
         setNelsonZeroTime(null);
         localStorage.removeItem("nelsonZeroTime");
       }
-    } else if (nelsonZeroTime === null) {
-      const currentNow = Date.now();
-      setNelsonZeroTime(currentNow);
-      localStorage.setItem("nelsonZeroTime", currentNow.toString());
+      if (nelsonPositiveTime === null) {
+        const t = Date.now();
+        setNelsonPositiveTime(t);
+        localStorage.setItem("nelsonPositiveTime", t.toString());
+      }
+    } else {
+      if (nelsonPositiveTime !== null) {
+        setNelsonPositiveTime(null);
+        localStorage.removeItem("nelsonPositiveTime");
+      }
+      if (nelsonZeroTime === null) {
+        const t = Date.now();
+        setNelsonZeroTime(t);
+        localStorage.setItem("nelsonZeroTime", t.toString());
+      }
     }
-  }, [nelsonSolarW, nelsonZeroTime]);
+  }, [nelsonSolarW, nelsonZeroTime, nelsonPositiveTime]);
 
+  // Granny: track when solar goes to zero or becomes positive
   useEffect(() => {
     if (grannySolarW > 0) {
       if (grannyZeroTime !== null) {
         setGrannyZeroTime(null);
         localStorage.removeItem("grannyZeroTime");
       }
-    } else if (grannyZeroTime === null) {
-      const currentNow = Date.now();
-      setGrannyZeroTime(currentNow);
-      localStorage.setItem("grannyZeroTime", currentNow.toString());
+      if (grannyPositiveTime === null) {
+        const t = Date.now();
+        setGrannyPositiveTime(t);
+        localStorage.setItem("grannyPositiveTime", t.toString());
+      }
+    } else {
+      if (grannyPositiveTime !== null) {
+        setGrannyPositiveTime(null);
+        localStorage.removeItem("grannyPositiveTime");
+      }
+      if (grannyZeroTime === null) {
+        const t = Date.now();
+        setGrannyZeroTime(t);
+        localStorage.setItem("grannyZeroTime", t.toString());
+      }
     }
-  }, [grannySolarW, grannyZeroTime]);
+  }, [grannySolarW, grannyZeroTime, grannyPositiveTime]);
 
+  // State transitions: orange→grey after 30s zero, grey→orange after 30s positive
   useEffect(() => {
-    const int = setInterval(() => setNow(Date.now()), 10000);
-    return () => clearInterval(int);
-  }, []);
-
-  const nelsonGrey = nelsonSolarW <= 0 && nelsonZeroTime !== null && (now - nelsonZeroTime) >= 5 * 60 * 1000;
-  const grannyGrey = grannySolarW <= 0 && grannyZeroTime !== null && (now - grannyZeroTime) >= 5 * 60 * 1000;
+    if (!nelsonIsGrey && nelsonSolarW <= 0 && nelsonZeroTime !== null && (now - nelsonZeroTime) >= THRESHOLD_MS) {
+      setNelsonIsGrey(true);
+      localStorage.setItem("nelsonIsGrey", "true");
+    }
+    if (nelsonIsGrey && nelsonSolarW > 0 && nelsonPositiveTime !== null && (now - nelsonPositiveTime) >= THRESHOLD_MS) {
+      setNelsonIsGrey(false);
+      localStorage.setItem("nelsonIsGrey", "false");
+    }
+    if (!grannyIsGrey && grannySolarW <= 0 && grannyZeroTime !== null && (now - grannyZeroTime) >= THRESHOLD_MS) {
+      setGrannyIsGrey(true);
+      localStorage.setItem("grannyIsGrey", "true");
+    }
+    if (grannyIsGrey && grannySolarW > 0 && grannyPositiveTime !== null && (now - grannyPositiveTime) >= THRESHOLD_MS) {
+      setGrannyIsGrey(false);
+      localStorage.setItem("grannyIsGrey", "false");
+    }
+  }, [now, nelsonIsGrey, grannyIsGrey, nelsonSolarW, grannySolarW, nelsonZeroTime, grannyZeroTime, nelsonPositiveTime, grannyPositiveTime, THRESHOLD_MS]);
 
   function getSolarStyle(isGrey: boolean): React.CSSProperties {
     if (isGrey) return {
@@ -179,7 +252,7 @@ export function SimplifiedDashboard({
       {/* ── Row 1: Solar Generation ── */}
       <div className={styles.sectionLabel}>☀ Solar Generation</div>
       <div className={styles.row}>
-        <div className={styles.circle} style={getSolarStyle(nelsonGrey)}>
+        <div className={styles.circle} style={getSolarStyle(nelsonIsGrey)}>
           <span className={styles.circleLabel}>Nelsons House</span>
           <span className={styles.circleValue}>{fmtKW(nelsonSolarW)}</span>
         </div>
@@ -187,7 +260,7 @@ export function SimplifiedDashboard({
           <span className={styles.centerLabel}>Combined</span>
           <span className={styles.centerValue}>{fmtKW(combinedSolarW)}</span>
         </div>
-        <div className={styles.circle} style={getSolarStyle(grannyGrey)}>
+        <div className={styles.circle} style={getSolarStyle(grannyIsGrey)}>
           <span className={styles.circleLabel}>5A / Granny Flat</span>
           <span className={styles.circleValue}>{fmtKW(grannySolarW)}</span>
         </div>
