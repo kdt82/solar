@@ -85,15 +85,44 @@ export function SimplifiedDashboard({
   const nelsonGrey = nelsonSolarW <= 0 && nelsonZeroTime !== null && (now - nelsonZeroTime) >= 5 * 60 * 1000;
   const grannyGrey = grannySolarW <= 0 && grannyZeroTime !== null && (now - grannyZeroTime) >= 5 * 60 * 1000;
 
-  function getSolarStyle(isGrey: boolean) {
-    if (isGrey) return { background: "#64748b", borderColor: "#475569", color: "#fff" };
-    return { background: "#f59e0b", borderColor: "#d97706", color: "#fff" };
+  function getSolarStyle(isGrey: boolean): React.CSSProperties {
+    if (isGrey) return {
+      background: "linear-gradient(145deg, #94a3b8, #64748b)",
+      border: "3px solid #475569",
+      boxShadow: "inset 0 4px 6px rgba(255, 255, 255, 0.2), 0 6px 12px rgba(0, 0, 0, 0.15)",
+      color: "#f8fafc"
+    };
+    return {
+      background: "linear-gradient(145deg, #fbbf24, #f59e0b)",
+      border: "3px solid #d97706",
+      boxShadow: "inset 0 4px 6px rgba(255, 255, 255, 0.3), 0 6px 12px rgba(245, 158, 11, 0.3)",
+      color: "#fff",
+      textShadow: "0 1px 2px rgba(0, 0, 0, 0.15)"
+    };
   }
 
-  function getUsageStyle(w: number) {
-    if (w < 1500) return { background: "#22c55e", borderColor: "#16a34a", color: "#fff" }; // Green
-    if (w <= 2500) return { background: "#f59e0b", borderColor: "#d97706", color: "#fff" }; // Orange
-    return { background: "#ef4444", borderColor: "#dc2626", color: "#fff" }; // Red
+  function getUsageStyle(w: number): React.CSSProperties {
+    if (w < 1500) return {
+      background: "linear-gradient(145deg, #4ade80, #22c55e)",
+      border: "3px solid #16a34a",
+      boxShadow: "inset 0 4px 6px rgba(255, 255, 255, 0.3), 0 6px 12px rgba(34, 197, 94, 0.3)",
+      color: "#fff",
+      textShadow: "0 1px 2px rgba(0, 0, 0, 0.15)"
+    }; // Green
+    if (w <= 2500) return {
+      background: "linear-gradient(145deg, #fbbf24, #f59e0b)",
+      border: "3px solid #d97706",
+      boxShadow: "inset 0 4px 6px rgba(255, 255, 255, 0.3), 0 6px 12px rgba(245, 158, 11, 0.3)",
+      color: "#fff",
+      textShadow: "0 1px 2px rgba(0, 0, 0, 0.15)"
+    }; // Orange
+    return {
+      background: "linear-gradient(145deg, #f87171, #ef4444)",
+      border: "3px solid #dc2626",
+      boxShadow: "inset 0 4px 6px rgba(255, 255, 255, 0.3), 0 6px 12px rgba(239, 68, 68, 0.3)",
+      color: "#fff",
+      textShadow: "0 1px 2px rgba(0, 0, 0, 0.15)"
+    }; // Red
   }
 
   // Battery SOC: 12% actual = 0% displayed, 100% = 100%
