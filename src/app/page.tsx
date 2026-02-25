@@ -231,10 +231,10 @@ export default function Home() {
             const granny = data?.devices?.find((d) => d.id === "granny-flat");
             const rawProps = hinenData?.raw_properties;
 
-            const nelsonSolarW = rawProps?.GenerationPower ?? (nelson?.generation ?? 0) * 1000;
-            const nelsonLoadW  = (nelson?.consumption ?? 0) * 1000;
-            const batteryW     = rawProps?.BatteryPower ?? 0; // +ve = charging, -ve = discharging
-            const batterySoc   = hinenData?.battery.soc ?? 0;
+            const nelsonSolarW = (nelson?.generation ?? 0) * 1000;
+            const nelsonLoadW = (nelson?.consumption ?? 0) * 1000;
+            const batteryW = rawProps?.BatteryPower ?? 0; // +ve = charging, -ve = discharging
+            const batterySoc = hinenData?.battery.soc ?? 0;
             const displayedSoc = Math.max(0, Math.round(((batterySoc - 12) / 88) * 100));
 
             const totalPropertyGridW = rawProps?.GridTotalPower ?? (nelson?.grid ?? 0) * 1000;
@@ -450,82 +450,82 @@ function HistoricalSection({
   const needsCustomRange = isCustom && (!customFrom || !customTo);
   const summaryCards: SummaryCard[] = data
     ? (() => {
-        const generated = formatEnergy(data.totals.energyGenerated);
-        const consumed = formatEnergy(data.totals.energyConsumed);
-        const exported = formatEnergy(data.totals.energyExported);
-        const imported = formatEnergy(data.totals.energyImported);
-        const net = data.totals.energyNet;
-        const netDisplay = formatEnergy(Math.abs(net));
-        const peak = formatPower(data.totals.peakGeneration);
-        const average = formatPower(data.totals.averageGeneration);
-        const netIcon = net >= 0 ? <IconArrowUpRight size={20} /> : <IconArrowDownRight size={20} />;
-        const netAccent = net >= 0 ? "var(--positive)" : "var(--danger)";
-        const uptime = formatPercent(data.totals.uptimePercent);
+      const generated = formatEnergy(data.totals.energyGenerated);
+      const consumed = formatEnergy(data.totals.energyConsumed);
+      const exported = formatEnergy(data.totals.energyExported);
+      const imported = formatEnergy(data.totals.energyImported);
+      const net = data.totals.energyNet;
+      const netDisplay = formatEnergy(Math.abs(net));
+      const peak = formatPower(data.totals.peakGeneration);
+      const average = formatPower(data.totals.averageGeneration);
+      const netIcon = net >= 0 ? <IconArrowUpRight size={20} /> : <IconArrowDownRight size={20} />;
+      const netAccent = net >= 0 ? "var(--positive)" : "var(--danger)";
+      const uptime = formatPercent(data.totals.uptimePercent);
 
-        return [
-          {
-            key: "generated",
-            label: "Energy Generated",
-            value: generated.value,
-            unit: generated.unit,
-            icon: <IconSun size={20} />,
-            accent: "var(--positive)",
-            description:
-              "All the solar energy your panels produced during the selected window. We sample power (kW), average it, and multiply by the time between readings to convert it into kilowatt-hours.",
-          },
-          {
-            key: "consumed",
-            label: "Energy Consumed",
-            value: consumed.value,
-            unit: consumed.unit,
-            icon: <IconHome2 size={20} />,
-            accent: "var(--accent)",
-            description:
-              "Electricity used within the property over this timeframe. Positive numbers mean you drew energy to run appliances; negative numbers mean generation exceeded on-site use.",
-          },
-          {
-            key: "net",
-            label: net >= 0 ? "Net Export" : "Net Import",
-            value: netDisplay.value,
-            unit: netDisplay.unit,
-            icon: netIcon,
-            accent: netAccent,
-            helper: `Export ${exported.value}${exported.unit} | Import ${imported.value}${imported.unit}`,
-            description:
-              "Difference between solar sent to the grid and energy pulled from it. Export is counted when power flows out; import is counted when you pull power in.",
-          },
-          {
-            key: "peak",
-            label: "Peak Generation",
-            value: peak.value,
-            unit: peak.unit,
-            icon: <IconSparkles size={20} />,
-            accent: "var(--neutral)",
-            description:
-              "The single highest power reading from your inverters during this period. It shows the top output moment in kilowatts.",
-          },
-          {
-            key: "average",
-            label: "Average Generation",
-            value: average.value,
-            unit: average.unit,
-            icon: <IconTrendingUp size={20} />,
-            accent: "var(--neutral)",
-            description:
-              "The mean solar output across all samples. We add every power reading together and divide by the number of samples to show a typical output level.",
-          },
-          {
-            key: "uptime",
-            label: "Fleet Uptime",
-            value: uptime,
-            icon: <IconClockHour4 size={20} />,
-            accent: "var(--accent)",
-            helper: data.totals.uptimePercent >= 99.9 ? "Excellent availability" : "Includes offline intervals",
-            description:
-              "How often the inverters responded when we polled them. Each successful reading counts as online; the percentage shows online samples versus the total.",
-          },
-        ];
-      })()
+      return [
+        {
+          key: "generated",
+          label: "Energy Generated",
+          value: generated.value,
+          unit: generated.unit,
+          icon: <IconSun size={20} />,
+          accent: "var(--positive)",
+          description:
+            "All the solar energy your panels produced during the selected window. We sample power (kW), average it, and multiply by the time between readings to convert it into kilowatt-hours.",
+        },
+        {
+          key: "consumed",
+          label: "Energy Consumed",
+          value: consumed.value,
+          unit: consumed.unit,
+          icon: <IconHome2 size={20} />,
+          accent: "var(--accent)",
+          description:
+            "Electricity used within the property over this timeframe. Positive numbers mean you drew energy to run appliances; negative numbers mean generation exceeded on-site use.",
+        },
+        {
+          key: "net",
+          label: net >= 0 ? "Net Export" : "Net Import",
+          value: netDisplay.value,
+          unit: netDisplay.unit,
+          icon: netIcon,
+          accent: netAccent,
+          helper: `Export ${exported.value}${exported.unit} | Import ${imported.value}${imported.unit}`,
+          description:
+            "Difference between solar sent to the grid and energy pulled from it. Export is counted when power flows out; import is counted when you pull power in.",
+        },
+        {
+          key: "peak",
+          label: "Peak Generation",
+          value: peak.value,
+          unit: peak.unit,
+          icon: <IconSparkles size={20} />,
+          accent: "var(--neutral)",
+          description:
+            "The single highest power reading from your inverters during this period. It shows the top output moment in kilowatts.",
+        },
+        {
+          key: "average",
+          label: "Average Generation",
+          value: average.value,
+          unit: average.unit,
+          icon: <IconTrendingUp size={20} />,
+          accent: "var(--neutral)",
+          description:
+            "The mean solar output across all samples. We add every power reading together and divide by the number of samples to show a typical output level.",
+        },
+        {
+          key: "uptime",
+          label: "Fleet Uptime",
+          value: uptime,
+          icon: <IconClockHour4 size={20} />,
+          accent: "var(--accent)",
+          helper: data.totals.uptimePercent >= 99.9 ? "Excellent availability" : "Includes offline intervals",
+          description:
+            "How often the inverters responded when we polled them. Each successful reading counts as online; the percentage shows online samples versus the total.",
+        },
+      ];
+    })()
     : [];
 
   return (

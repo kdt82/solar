@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./SimplifiedDashboard.module.css";
 
 interface SimplifiedDashboardProps {
@@ -57,6 +57,45 @@ export function SimplifiedDashboard({
   const combinedSolarW = nelsonSolarW + grannySolarW;
   const combinedLoadW = nelsonLoadW + grannyLoadW;
 
+  const [nelsonZeroTime, setNelsonZeroTime] = useState<number | null>(null);
+  const [grannyZeroTime, setGrannyZeroTime] = useState<number | null>(null);
+  const [now, setNow] = useState<number>(Date.now());
+
+  useEffect(() => {
+    if (nelsonSolarW > 0) {
+      setNelsonZeroTime(null);
+    } else if (nelsonZeroTime === null) {
+      setNelsonZeroTime(Date.now());
+    }
+  }, [nelsonSolarW, nelsonZeroTime]);
+
+  useEffect(() => {
+    if (grannySolarW > 0) {
+      setGrannyZeroTime(null);
+    } else if (grannyZeroTime === null) {
+      setGrannyZeroTime(Date.now());
+    }
+  }, [grannySolarW, grannyZeroTime]);
+
+  useEffect(() => {
+    const int = setInterval(() => setNow(Date.now()), 10000);
+    return () => clearInterval(int);
+  }, []);
+
+  const nelsonGrey = nelsonSolarW <= 0 && nelsonZeroTime !== null && (now - nelsonZeroTime) >= 5 * 60 * 1000;
+  const grannyGrey = grannySolarW <= 0 && grannyZeroTime !== null && (now - grannyZeroTime) >= 5 * 60 * 1000;
+
+  function getSolarStyle(isGrey: boolean) {
+    if (isGrey) return { background: "#64748b", borderColor: "#475569", color: "#fff" };
+    return { background: "#f59e0b", borderColor: "#d97706", color: "#fff" };
+  }
+
+  function getUsageStyle(w: number) {
+    if (w < 1500) return { background: "#22c55e", borderColor: "#16a34a", color: "#fff" }; // Green
+    if (w <= 2500) return { background: "#f59e0b", borderColor: "#d97706", color: "#fff" }; // Orange
+    return { background: "#ef4444", borderColor: "#dc2626", color: "#fff" }; // Red
+  }
+
   // Battery SOC: 12% actual = 0% displayed, 100% = 100%
   const displayedSoc = Math.max(0, Math.round(((batterySoc - 12) / 88) * 100));
 
@@ -88,7 +127,7 @@ export function SimplifiedDashboard({
       {/* ── Row 1: Solar Generation ── */}
       <div className={styles.sectionLabel}>☀ Solar Generation</div>
       <div className={styles.row}>
-        <div className={`${styles.circle} ${styles.solarCircle}`}>
+        <div className={styles.circle} style={getSolarStyle(nelsonGrey)}>
           <span className={styles.circleLabel}>Nelsons House</span>
           <span className={styles.circleValue}>{fmtKW(nelsonSolarW)}</span>
         </div>
@@ -96,7 +135,7 @@ export function SimplifiedDashboard({
           <span className={styles.centerLabel}>Combined</span>
           <span className={styles.centerValue}>{fmtKW(combinedSolarW)}</span>
         </div>
-        <div className={`${styles.circle} ${styles.solarCircle}`}>
+        <div className={styles.circle} style={getSolarStyle(grannyGrey)}>
           <span className={styles.circleLabel}>5A / Granny Flat</span>
           <span className={styles.circleValue}>{fmtKW(grannySolarW)}</span>
         </div>
@@ -112,6 +151,9 @@ export function SimplifiedDashboard({
           <div className={styles.midCardTitle}>Battery SOC</div>
           <div className={styles.midCardBig} style={{ color: batteryColor }}>
             {displayedSoc}%
+          </div>
+          <div style={{ fontSize: '0.9rem', fontWeight: 800, color: batteryColor }}>
+            {((displayedSoc / 100) * 27).toFixed(1)} kW
           </div>
           <div className={styles.midCardSub}>
             {battCharging ? `↑ Charging` : battDischarging ? `↓ Discharging` : "Idle"}
@@ -142,7 +184,7 @@ export function SimplifiedDashboard({
       {/* ── Row 3: Property Usage ── */}
       <div className={styles.sectionLabel}>🏠 Property Usage</div>
       <div className={styles.row}>
-        <div className={`${styles.circle} ${styles.usageCircle}`}>
+        <div className={styles.circle} style={getUsageStyle(nelsonLoadW)}>
           <span className={styles.circleLabel}>Nelsons House</span>
           <span className={styles.circleValue}>{fmtKW(nelsonLoadW)}</span>
         </div>
@@ -150,7 +192,7 @@ export function SimplifiedDashboard({
           <span className={styles.centerLabel}>Combined</span>
           <span className={styles.centerValue}>{fmtKW(combinedLoadW)}</span>
         </div>
-        <div className={`${styles.circle} ${styles.usageCircle}`}>
+        <div className={styles.circle} style={getUsageStyle(grannyLoadW)}>
           <span className={styles.circleLabel}>5A / Granny Flat</span>
           <span className={styles.circleValue}>{fmtKW(grannyLoadW)}</span>
         </div>
