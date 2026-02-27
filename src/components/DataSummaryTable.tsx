@@ -10,19 +10,40 @@ interface DataSummaryTableProps {
   granny?: DeviceSnapshot;
   hinenData?: HinenStatus;
   batterySocDisplayed: number; // adjusted SOC (12% grace removed)
+  hinenOnline?: boolean;
 }
 
 function fmt(kw: number): string {
   return (Math.abs(kw)).toFixed(2) + " kW";
 }
 
-export function DataSummaryTable({ nelson, granny, hinenData, batterySocDisplayed }: DataSummaryTableProps) {
+function fmtTimestamp(iso?: string): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+}
+
+function timeAgo(iso?: string): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const secs = Math.round((Date.now() - d.getTime()) / 1000);
+  if (secs < 5) return "just now";
+  if (secs < 60) return `${secs}s ago`;
+  if (secs < 3600) return `${Math.floor(secs / 60)}m ago`;
+  return `${Math.floor(secs / 3600)}h ago`;
+}
+
+export function DataSummaryTable({ nelson, granny, hinenData, batterySocDisplayed, hinenOnline = true }: DataSummaryTableProps) {
   const batteryW  = hinenData?.raw_properties?.BatteryPower ?? 0;
   const batteryKW = Math.abs(batteryW) / 1000;
   const isCharging    = batteryW > 10;
   const isDischarging = batteryW < -10;
-  const battStatus = isCharging ? "Charging" : isDischarging ? "Discharging" : "Idle";
-  const battStatusClass = isCharging ? styles.statusCharging : isDischarging ? styles.statusDischarging : styles.statusIdle;
+  const battStatus = !hinenOnline ? "Offline" : isCharging ? "Charging" : isDischarging ? "Discharging" : "Idle";
+  const battStatusClass = !hinenOnline ? styles.statusOffline : isCharging ? styles.statusCharging : isDischarging ? styles.statusDischarging : styles.statusIdle;
+
+  const hinenTimestamp = hinenData?.timestamp;
 
   return (
     <div className={styles.wrapper}>
@@ -81,8 +102,8 @@ export function DataSummaryTable({ nelson, granny, hinenData, batterySocDisplaye
           <tbody>
             <tr>
               <td className={styles.deviceName}>Hinen SH6KL</td>
-              <td className={styles.soc}>{batterySocDisplayed}%</td>
-              <td className={styles.usage}>{batteryKW.toFixed(2)} kW</td>
+              <td className={styles.soc}>{hinenOnline ? `${batterySocDisplayed}%` : "—"}</td>
+              <td className={styles.usage}>{hinenOnline ? `${batteryKW.toFixed(2)} kW` : "—"}</td>
               <td>
                 <span className={battStatusClass}>
                   <span className={styles.dot} />
@@ -90,6 +111,45 @@ export function DataSummaryTable({ nelson, granny, hinenData, batterySocDisplaye
                 </span>
               </td>
               <td className={styles.refresh}>30 sec (cloud)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* ── Infrastructure Table ───────────────────────────── */}
+      <div className={styles.tableCard}>
+        <div className={styles.tableTitle}>System Infrastructure</div>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Device</th>
+              <th>Role</th>
+              <th>Last Seen</th>
+              <th>Status</th>
+              <th>Refresh</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className={styles.deviceName}>Raspberry Pi</td>
+              <td className={styles.role}>Hinen Battery Proxy</td>
+              <td className={styles.lastSeen}>
+                {hinenOnline ? (
+                  <>
+                    {fmtTimestamp(hinenTimestamp)}
+                    <span className={styles.timeAgo}>{timeAgo(hinenTimestamp)}</span>
+                  </>
+                ) : (
+                  <span className={styles.lastSeenOffline}>No response</span>
+                )}
+              </td>
+              <td>
+                <span className={hinenOnline ? styles.statusOnline : styles.statusOffline}>
+                  <span className={styles.dot} />
+                  {hinenOnline ? "Online" : "Offline"}
+                </span>
+              </td>
+              <td className={styles.refresh}>30 sec</td>
             </tr>
           </tbody>
         </table>

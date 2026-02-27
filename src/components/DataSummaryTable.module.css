@@ -94,6 +94,31 @@
   color: var(--text-soft, #94a3b8);
 }
 
+.role {
+  font-size: 0.8rem;
+  color: var(--text-soft, #64748b);
+}
+
+.lastSeen {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text, #0f172a);
+}
+
+.timeAgo {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: var(--text-soft, #94a3b8);
+  margin-top: 1px;
+}
+
+.lastSeenOffline {
+  color: #dc2626;
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
 /* ── Status badges ─────────────────────────────── */
 .statusOnline,
 .statusOffline,
@@ -166,6 +191,14 @@
 
 :root[data-theme="dark"] .statusOffline {
   background: rgba(255, 107, 107, 0.15);
+  color: #ff6b6b;
+}
+
+:root[data-theme="dark"] .lastSeen {
+  color: var(--text, #f8fafc);
+}
+
+:root[data-theme="dark"] .lastSeenOffline {
   color: #ff6b6b;
 }
 

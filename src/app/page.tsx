@@ -240,11 +240,14 @@ export default function Home() {
             const granny = data?.devices?.find((d) => d.id === "granny-flat");
             const rawProps = hinenData?.raw_properties;
 
+            const hinenOnline = hinenData?.ok === true;
             const nelsonSolarW = (nelson?.generation ?? 0) * 1000;
             const nelsonLoadW = (nelson?.consumption ?? 0) * 1000;
             const batteryW = rawProps?.BatteryPower ?? 0; // +ve = charging, -ve = discharging
-            const batterySoc = hinenData?.battery.soc ?? 0;
-            const displayedSoc = Math.max(0, Math.round(((batterySoc - 12) / 88) * 100));
+            const batterySoc = hinenData?.battery?.soc ?? 0;
+            const displayedSoc = hinenOnline
+              ? Math.max(0, Math.round(((batterySoc - 12) / 88) * 100))
+              : 0;
 
             const totalPropertyGridW = rawProps?.GridTotalPower ?? (nelson?.grid ?? 0) * 1000;
             // Hinen convention: gridW > 0 = importing, gridW < 0 = exporting
@@ -261,6 +264,7 @@ export default function Home() {
                     batteryW={batteryW}
                     batterySoc={batterySoc}
                     gridW={combinedGridW}
+                    batteryOnline={hinenOnline}
                   />
                 </section>
 
@@ -270,6 +274,7 @@ export default function Home() {
                   granny={granny}
                   hinenData={hinenData}
                   batterySocDisplayed={displayedSoc}
+                  hinenOnline={hinenOnline}
                 />
               </>
             );

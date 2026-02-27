@@ -11,6 +11,7 @@ interface SimplifiedDashboardProps {
   batteryW: number;    // +ve = charging, -ve = discharging
   batterySoc: number;
   gridW: number;       // raw device: -ve = importing, +ve = exporting
+  batteryOnline?: boolean; // false when Hinen proxy is unreachable
 }
 
 function fmtKW(w: number): string {
@@ -53,6 +54,7 @@ export function SimplifiedDashboard({
   batteryW,
   batterySoc,
   gridW,
+  batteryOnline = true,
 }: SimplifiedDashboardProps) {
   const combinedSolarW = nelsonSolarW + grannySolarW;
   const combinedLoadW = nelsonLoadW + grannyLoadW;
@@ -222,7 +224,9 @@ export function SimplifiedDashboard({
   }
 
   // Battery SOC: 12% actual = 0% displayed, 100% = 100%
-  const displayedSoc = Math.max(0, Math.round(((batterySoc - 12) / 88) * 100));
+  const displayedSoc = batteryOnline
+    ? Math.max(0, Math.round(((batterySoc - 12) / 88) * 100))
+    : null;
 
   // Hinen convention (confirmed in lib/hinen.ts deriveNelsonsFlows):
   // gridW > 0 = importing from grid, gridW < 0 = exporting to grid
@@ -231,12 +235,13 @@ export function SimplifiedDashboard({
   const gridLabel = isExporting ? "Exporting" : isImporting ? "Importing" : "Idle";
   const gridColor = isExporting ? "#22c55e" : isImporting ? "#ef4444" : "#64748b";
 
-  const batteryColor =
-    displayedSoc > 60 ? "#22c55e" : displayedSoc > 25 ? "#f59e0b" : "#ef4444";
+  const batteryColor = !batteryOnline
+    ? "#64748b"
+    : (displayedSoc ?? 0) > 60 ? "#22c55e" : (displayedSoc ?? 0) > 25 ? "#f59e0b" : "#ef4444";
 
   // Battery connector: charging = System→Battery = dots flow left (battery is on left)
-  const battCharging = batteryW > 10;
-  const battDischarging = batteryW < -10;
+  const battCharging = batteryOnline && batteryW > 10;
+  const battDischarging = batteryOnline && batteryW < -10;
   const battDirection: "left" | "right" | "idle" = battCharging ? "left" : battDischarging ? "right" : "idle";
 
   // Grid connector: exporting = System→Grid = dots flow right (grid is on right)
@@ -274,15 +279,31 @@ export function SimplifiedDashboard({
         <div className={styles.midCard} style={{ borderColor: batteryColor }}>
           <div className={styles.midCardIcon}>🔋</div>
           <div className={styles.midCardTitle}>Battery SOC</div>
-          <div className={styles.midCardBig} style={{ color: batteryColor }}>
-            {displayedSoc}%
-          </div>
-          <div style={{ fontSize: '0.9rem', fontWeight: 800, color: batteryColor }}>
-            {((displayedSoc / 100) * 27).toFixed(1)} kW
-          </div>
-          <div className={styles.midCardSub}>
-            {battCharging ? `↑ Charging` : battDischarging ? `↓ Discharging` : "Idle"}
-          </div>
+          {batteryOnline && displayedSoc !== null ? (
+            <>
+              <div className={styles.midCardBig} style={{ color: batteryColor }}>
+                {displayedSoc}%
+              </div>
+              <div style={{ fontSize: '0.9rem', fontWeight: 800, color: batteryColor }}>
+                {((displayedSoc / 100) * 27).toFixed(1)} kWh
+              </div>
+              <div className={styles.midCardSub}>
+                {battCharging ? `↑ Charging` : battDischarging ? `↓ Discharging` : "Idle"}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className={styles.midCardBig} style={{ color: "#ef4444" }}>
+                —
+              </div>
+              <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#ef4444' }}>
+                Data unavailable
+              </div>
+              <div className={styles.midCardSub}>
+                Hinen proxy offline
+              </div>
+            </>
+          )}
         </div>
 
         <FlowConnector direction={battDirection} color={batteryColor} />
